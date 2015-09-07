@@ -1,0 +1,597 @@
+
+== Het Geheugen 
+
+=== Overzicht
+Het belang van geheugen is tijdens de cursus computertechniek al voldoende gebleken. Zoals bekend worden zowel uit te voeren instructies als data opgeslagen in dit geheugen. (cfr de 'von Neumann architectuur') Dit legt twee belangrijke behoeften bloot: snelheid en grootte. 
+
+*Snelheid* is erg belangrijk omdat het geheugen de processor moet voorzien van uit te voeren instructies. Een snelle processor met traag geheugen geeft een traag systeem. 
+
+*Grootte* is dan weer belangrijk omdat zowel programma’s als de te bewerken data aanzienlijk zijn toegenomen. Bovendien moeten in een multitasking omgeving meerdere programma’s en dus ook grotere hoeveelheden data opgeslagen worden in het geheugen. 
+
+Als de verschillende soorten geheugens bekeken worden, wordt ook wel gesproken van de geheugenpiramide. Deze term wordt gebruikt omdat de hoeveelheid geheugen afneemt naarmate je stijgt in de piramide. De reden hiervoor is dat ook de prijs per byte toeneemt naarmate je hoger gaat in de piramide. 
+
+.Geheugenpiramide
+image::ch03/images/geheugenpiramide.png[alt="geheugenpiramide", align="center", scaledwidth="50", width=400] 
+
+Daarnaast neemt de snelheid van het geheugen toe in de richting van de top van de piramide. In deze voorstelling is het begrip geheugen vrij ruim geïnterpreteerd. We zullen het in dit hoofdstuk niet hebben over registers of opslagmedia, wel over de technieken die toegepast worden om het geheugen voldoende snel en groot te maken.
+
+=== Lokaliteitsprincipes
+Bij het bestuderen van de technieken die gebruikt worden om het geheugen groot en snel te maken, zullen we regelmatig beroep doen op de zogenaamde lokaliteitsprincipes. Daarbij maken we een onderscheid tussen plaatsgebonden lokaliteit en tijdsgebonden lokaliteit. <<PATT1>>
+
+Tijdsgebonden lokaliteit:: Als je een bepaald item gebruikt, dan is de kans groot dat je dat binnenkort terug nodig hebt.
+
+Plaatsgebonden lokaliteit:: Als je een bepaald item gebruikt, dan is de kans groot dat je binnenkort iets nodig hebt dat in de buurt voorkomt...
+
+Een paar voorbeeldjes bij deze principes: 
+
+* Sequentiële uitvoering van instructies in een programma. (plaatsgebonden)
+* Lussen in code, er is een regel die zegt dat programma’s 90% van hun tijd spenderen met het uitvoeren van 10% van de code, dus worden regelmatig dezelfde stukken geheugen aangesproken +(tijdsgebonden & plaatsgebonden)+
+* Bestanden op een schijf worden, indien mogelijk, in opeenvolgende clusters opgeslagen. +(plaatsgebonden)+
+* bij een computerprogramma zullen bepaalde variabelen erg vaak gebruikt worden +(tijdsgebonden)+
+
+.oefening 
+====
+op welke manieren komen deze principes tot uiting in onderstaande java-code?
+====
+
+[source,java]
+----
+public class Vermenigvuldigingstafels {
+	int score;<1>
+
+	public void test() {
+		for (int i = 1; i <= 10; i++) {
+			vraagEnAntwoord();<2>
+		}
+
+		drukResultaat();
+	}
+
+	public void vraagEnAntwoord() {
+		int getal1 = (int)(Math.random() * 11);<3>
+		int getal2 = (int)(Math.random() * 11);
+
+		System.out.print(getal1 + " * " + getal2 + " = ");
+
+		if (Input.readInt() == getal1 * getal2) {
+			score++;
+		} else {
+			System.out.println("fout");
+		}
+	}
+
+	public void drukResultaat() {
+		System.out.println("Je score: " + score + "/10");
+	}
+
+	public static void main (String args[]) {
+			Vermenigvuldigingstafels tafels = new Vermenigvuldigingstafels();
+			tafels.test();
+	}
+}
+----
+<1> variabelen worden typisch meerdere keren opgevraagd tijdens de duur van een programma. (=tijdsgebonden lokaliteit)
+<2>	een lus zorgt ervoor dat binnen bepaalde tijd code meerdere keren uitgevoerd wordt. (=tijdsgebonden lokaliteit)
+<3> deze regels code worden na elkaar uitgevoerd. Er is dus plaatsgebonden lokaliteit.
+
+.oefening
+====
+Uiteraard speelt de programmeertaal geen rol bij dit principe. Kan je de dit aantonen met onderstaand assembler-fragment?
+====
+
+[source,assembly]
+----
+; x86 ASM code
+
+.model small
+.stack
+.data
+.code
+
+start:
+	mov ah,01h  ; karakter inlezen
+	int 21h     ; resultaat in AL
+	mov dl,31h  ; cijfer 1
+	mov bl,al   ; AL wordt beïnvloedt door int 21h verderop
+	inc bl		; eentje bijtellen
+lus:
+	mov ah,02h  ; karakter schrijven
+	int 21h
+	inc dl      ; teller verhogen
+	cmp dl,bl   ; vergelijken met eindwaarde
+	jnz lus     ; conditioneel springen
+	
+	mov ah,08h  ; karakter inlezen
+	int 21h   
+	mov ah,4Ch  ; afsluiten
+	int 21h
+end start
+----
+
+=== Soorten geheugens
+Tussen de verschillende soorten geheugens kan een onderscheid gemaakt worden op een aantal vlakken. 
+
+==== Behuizing
+Het meest tastbare onderscheid kan gemaakt worden op het vlak van de behuizing. Origineel gebruikte men op de PC geheugen onder de vorm van discrete chips. +
+Naarmate de capaciteit van het geheugen steeg, werd dit te duur en ging men over op geheugenmodules.
+
+Daarnaast spreekt men soms van het gebruik van geheugenbanken. Een geheugenbank op een moederbord bestaat uit een of meerdere sockets of geheugenvoeten (insteekplaatsen voor geheugenchips). +
+Het aantal sockets per geheugenbank hangt af van de uitvoeringsvorm van het gebruikte geheugen en van de breedte van de databus. Een geheugenbank heeft dezelfde breedte als de databus die voor de aansluiting op de datalijnen zorgt. 
+
+Niet alle geheugenbanken moeten gevuld zijn maar iedere geheugenbank waar geheugen in geplaatst werd, moet volledig gevuld zijn. In moderne systemen vult een module een volledige geheugenbank en is deze dus automatisch vervuld. Een geheugenmodule wordt gekenmerkt door het aantal contactpunten (pins), de werkspanning en het soort geheugenchip. Het is de geheugencapaciteit van alle chips samen die de capaciteit van de module bepalen.
+
+Langs beide zijden van een geheugenmodule bevinden zich contactpunten. Indien deze contactpunten inwendig verbonden zijn spreekt men van een SIMM (Single Inline Memory Module). Indien deze contactpunten afzonderlijk werken en niet verbonden zijn spreekt men over een DIMM (Dual Inline Memory Module). +
+Een DIMM biedt op dezelfde afstand veel meer contactpunten en wordt dan ook toegepast in de moderne modules, die onder andere voor de steeds breder wordende databussen extra contactpunten nodig hebben. 
+ 
+.Courante DDR-dimm modules (Wikimedia public domain)
+
+image::ch03/images/DDR_Memory_Comparison.svg.png[alt="DDR-dimm", align="center", scaledwidth="50",width="300"] 
+
+Een variante van DIMM is so-DIMM (small outline), een miniatuurversie van DIMM, specifiek geschikt voor mobiele apparatuur als laptops.
+ 
+.SO-DIMM modules (Wikimedia public domain)
+image::ch03/images/Laptop_SODIMM_DDR_Memory_Comparison_V2.svg.png[alt="", align="center", scaledwidth="50", width="300"] 
+
+
+
+=== Technologie 
+Een zeer belangrijk onderscheid tussen geheugens kan gemaakt worden op het vlak van de technologie die gebruikt werd om de geheugencellen te bouwen. Er zijn twee soorten: statisch en dynamisch geheugen. Statisch geheugen is opgebouwd uit actieve geheugencellen (flipflop schakelingen). Deze vragen een grotere complexiteit bij het IC ontwerp en zijn dus duur. Anderzijds zijn ze zeer snel. Uit deze eigenschappen kan je afleiden dat ze hoog in de piramide worden toegepast. Meer bepaald gebeurt dit bij de snelle cache geheugens. 
+ 
+.voorstelling statisch geheugen
+image::ch03/images/statisch.png[alt="statisch geheugen", align="center", width="300", scaledwidth="50"]
+
+Dynamisch geheugen bestaat in essentie eigenlijk gewoon uit een condensator. Als je over een condensator een gelijkspanning aanbrengt en die vervolgens wegneemt, kan je achteraf nog meten welk spanning erop stond. Dit is een vorm van geheugen. Deze geheugens hebben twee belangrijke nadelen. Ten eerste zal een leesoperatie de condensator ontladen. 
+ 
+.Voorstelling leescyclus dynamisch geheugen
+image::ch03/images/406px-Square_array_of_mosfet_cells_read.png[alt="leescyclus dynamisch geheugen", align="center", scaledwidth="50"]
+
+Een leesoperatie is met andere woorden destructief. Ten tweede bestaan er geen perfecte condensatoren en vertoont dit soort geheugen dus ook een lek. Dit betekent dat mettertijd de inhoud van het geheugen verloren gaat, tenzij die ververst wordt. Bij dit soort van geheugen is dan ook een regelmatige refresh noodzakelijk. Vergeleken met statisch geheugen is dynamisch geheugen trager. Het statisch geheugen is een actieve schakeling en kan dus stroom sturen of opnemen als het gelezen wordt. + Dynamisch geheugen kan niet echt stroom sturen, het is de condensator die ontladen of opgeladen wordt. Anderzijds is dynamisch geheugen dan weer goedkoper, waardoor het toegepast wordt op een lager niveau in de piramide. Meer bepaald is dit de technologie die in geheugenmodules wordt gebruikt. Deze zijn ook gangbaar bekend onder de term RAM of DRAM. 
+
+=== DRAM technologie
+
+==== Gemultiplexte adresklemmen
+
+Dynamische RAMs hebben vanwege de grote densiteit meestal ook een grote capaciteit op de chip (tegenwoordig tot 16 Gbit per chip). Een dergelijke capaciteit betekent ook dat er heel wat adressignalen noodzakelijk zijn om een welbepaalde geheugencel te selecteren. Wanneer elk signaal op een aparte pin zou aangesloten worden, zou het noodzakelijk zijn om zeer grote behuizingen te gebruiken. +
+Om dit probleem te omzeilen, wordt gebruik gemaakt van gemultiplexte adreslijnen: het volledige adres wordt opgesplitst in een Column Address en een Row Address. 
+ 
+Deze twee adresgedeeltes worden de een na de ander aangeboden aan de adresklemmen van het IC. Hierbij wordt gebruik gemaakt van de RAS- en CAS-klem om de twee adresgedeelten te latchen. +
+De snelheid van het geheugen wordt in grote mate bepaald door de toegangstijd T~acc~.
+
+==== Destructieve leescyclus
+Eerder werd al aangegeven hoe een leescyclus de data op de condensatoren zal vernietigen. Dit is uiteraard een onaanvaardbare situatie. De oplossing ligt voor de hand. Als data gelezen is, wordt dezelfde data nadien terug weggeschreven, zodat de originele toestand hersteld wordt. Uiteraard is het niet verstandig deze taak aan de processor toe te wijzen, het is iets wat in de geheugenchips zelf geregeld moet worden. Het geheugen is, zoals in vorige paragraaf werd aangegeven, opgebouwd als een matrix van rijen met een welbepaald aantal kolommen. Naast deze matrix van dynamische geheugencellen is er ook een rij van statische geheugencellen. Op het ogenblik dat een rij-adres aangelegd wordt, zal de dynamische rij gekopieerd worden naar de statische rij. Hierbij verliest de dynamische rij dus haar inhoud. Vervolgens kan de gewenste cel gelezen worden en daarna wordt de inhoud van de statische rij weer naar de matrix gekopieerd. Hierdoor wordt de inhoud van het geheugen hersteld.
+
+==== Refresh
+Met deze kennis wordt ook duidelijk hoe een refresh georganiseerd kan worden. Op regelmatige tijdstippen zal een zogenaamde RAS-only cylcus uitgevoerd worden. Hierbij wordt eigenlijk elke rij geselecteerd, gekopieerd naar de statische rij en weer weggeschreven. Hierdoor is de originele inhoud weer op peil gebracht, op voorwaarde dat deze cyclus voldoende regelmatig herhaald wordt. Met deze manier moet niet elke cel afzonderlijk gerefreshed worden, maar wordt een volledige rij ineens hersteld.
+ 
+.Dynamisch geheugen met statische buffer
+image::ch03/images/geheugenmetstatischbuffer.png[alt="dynamisch geheugen", align="center", scaledwidth="50", width="300"] 
+
+
+==== Bandbreedte bij DRAM
+
+DRAM heeft, zoals je verder zal lezen, de eigenschap te werken met cyclussen. Om te berekenen wat de effectieve bandbreedte is (=geheugendebiet) hoor je steeds dezelfde benadering te maken:
+
+[latexmath]
+++++
+\text{bandbreedte} = \dfrac {\text{Aantal bytes die getransfereerd worden bij een cyclus}}                               {\text{tijdsduur van een cyclus}}
+++++
+
+Deze erg eenvoudige benadering wordt bij de verschillende types geheugen die volgen telkens toegepast.
+
+=== Fast Page DRAM (FP-DRAM)
+Hierboven werd reeds beschreven hoe met gemultiplexte adresklemmen eerst een rij-adres en vervolgens een kolomadres worden doorgegeven (langs dezelfde aansluitpinnen). Het voordeel hiervan is duidelijk: minder adresklemmen. +
+Het nadeel is dat een lees- of schrijfcyclus langer wordt. Het kost immers extra tijd om de adressen na elkaar door te geven. FP-DRAM verbetert de snelheid door cycli te combineren. 
+
+Zoals aangehaald bij het lokaliteitsprincipe gaan opeenvolgende cycli meestal door op naburige cyclusadressen. De kans dat meer dan een byte gelezen wordt in dezelfde rij, is dus vrij groot. FP-DRAM maakt hiervan gebruik door eenmaal een rij-adres op te geven en vervolgens een kolom te selecteren en deze te lezen of te schrijven. Onmiddellijk hierna wordt een tweede kolom geselecteerd en wordt deze gelezen of beschreven, vervolgens kan een derde kolom geselecteerd worden...Op die manier worden een aantal cycli vermeden. Het zal relatief lang duren vooraleer het eerste geheugenwoord gelezen kan worden, terwijl de volgende minder tijd vragen.
+ 
+.Fast page DRAM
+image::ch03/images/FPM.png[alt="fast page memory", align="center", scaledwidth="50"] 
+
+In praktijk wordt er bijna steeds gewerkt met een burst van vier leescycli waarbij aangeduid wordt hoeveel klokcycli er nodig zijn per transfert, bijvoorbeeld 5-3-3-3. +
+FP-DRAM werd gebruikt tot busfrequenties van 66 MHz. 
+
+Op een computersysteem met een 486 processor (32-bit databus) met 5-3-3-3 FP-DRAM geheugen aan 66Mhz betekent dit dat het maximale geheugendebiet gelijk is aan:
+
+[latexmath]
+++++
+\dfrac{4 \text{ bytes/transfer} \times 4 \text{ transfers/burst} \times 66 \text{ Mcycli/sec}}
+      {14 \text{ cycli/burst}}
+       = 75 MB/sec 
+++++
+
+=== EDO RAM
+ 
+.EDO-RAM
+image::ch03/images/edo.png[alt="fast page memory", align="center", scaledwidth="50"] 
+
+Extended Data Out-RAM is een aanpassing van het Fast Page-concept. Daarbij moest de memorycontroller wachten met het aanbieden van een nieuw kolomadres tot de vorige data gelezen waren. Bij EDO-RAM blijven de data op de uitgangen van het geheugen nog een tijd langer beschikbaar (zelfs tot na het aanbieden van het volgende kolomadres). Hierdoor wint men tijd: terwijl de data gelezen worden, kan men al het volgende kolomadres aanleggen. 
+EDO-RAM kon gebruikt worden tot een busklok van 75 MHz met een timing van 5-2-2-2 klokcycli. Als we EDO-RAM dan nog combineren met een 64-bit bus (Pentium) geeft dit een maximaal debiet van 218 MB/s
+
+[latexmath]
+++++
+\dfrac{8 \text{ bytes/transfer} \times 4 \text{ transfers/burst} \times 75 \text{ Mcycli/sec}}
+       {11 \text{cycli/burst}}                                                     = 218 \text{MB/sec}
+++++
+
+=== Synchronous DRAM
+
+.afbeelding 20 Leesoperatie bij SD-RAM (bron: Micron)
+image::ch03/images/timing/SDRAM_read.png[alt="", align="center", scaledwidth="50"] 
+
+Bij SDRAM gaat men nog een stap verder met het lokaliteitsprincipe. In plaats van uit te gaan van het lezen van naburige kolommen, wordt nu vertrokken van het idee dat opeenvolgende kolommen uitgelezen zullen worden. In het deel over cache geheugens zal duidelijk worden dat het RAM geheugen effectief op deze manier wordt aangesproken. De cyclus kan nu aangepast worden tot het aanleggen van een rij-adres, het selecteren van een kolom en vervolgens het inlezen of naar buiten brengen van een aantal opeenvolgende kolommen. Die kunnen naar buiten gebracht worden op het tempo van de klok. Vandaar spreekt men over synchroon DRAM.+ 
+In de afbeelding krijgen we een timing van 2-1-1-1. Daarnaast is SD-RAM geschikt voor busfrequenties tot 133 MHz (PC133), wat neerkomt op een maximaal debiet van 851 MBps.
+
+[latexmath]
+++++
+\dfrac{8 \text{ bytes/transfer} \times 4 \text{ transfers/burst} \times 133 \text{ Mcycli/sec}}
+     {5 \text{ cycli/burst}} 											= 851 \text{ MB/sec}
+++++
+
+==== DDR SDRAM - DDR2 - DDR3
+
+Principieel werkt DDR op dezelfde manier als SDRAM. Er wordt nog steeds een rij-adres en een kolomadres aangelegd, waarna meerdere opeenvolgende cellen worden uitgelezen. Het verschil zit in het tempo waarop dit gebeurt. Bij Double Data Rate wordt data naar buiten gebracht op stijgende en dalende flank van de klok. Om dit te kunnen bereiken wordt gebruik gemaakt van een prefetch buffer. In elke cyclus worden nu 2 bits getransfereerd naar het prefetch buffer, dat de data dan aan een dubbele snelheid naar buiten kan brengen.
+
+.Write cyclus bij DDR-RAM (bron: Micron)
+image::ch03/images/timing/DDRwritetiming.png[alt="sd ram read", align="center", scaledwidth="50"]
+
+Het voordeel van deze werkwijze is een hogere maximale bandbreedte (datasnelheid bij het effectief overbrengen van data). Het nadeel zit in een hogere latentietijd. Tussen het aanleggen van de adressen en het naar buiten brengen van de data verloopt iets meer tijd. De snelheid van de modules wordt uitgedrukt op een aantal verschillende manieren. Een eerste manier is in de naam, waar twee verschillende mogelijkheden bestaan. DDR400 en PC3200 duiden op hetzelfde soort geheugenchips. De 400 duidt de kloksnelheid aan (2x200MHz), de 3200 duidt de maximale transfersnelheid aan. 
+
+Op een 64-bit databus is die:
+
+[latexmath]
+++++
+8 \text{bytes/transfer} \times 2 \times 200 \text{ MHz} = 3200 \text{ MB/sec}
+++++
+
+Er kan echter nog veel verschil zijn tussen twee PC3200 modules. 
+De werkelijke snelheid hangt namelijk ook af van de totale latentietijd. Die kan op verschillende manieren worden aangegeven, maar een gangbare manier is het opgeven van vier getallen: TCL-Trcd-Trp-Tras. 
+
+* T~CL~ = CAS Latency Time: tijd tussen CAS en beschikbaar worden van data 
+* T~rcd~ = DRAM RAS to CAS Delay: tijd tussen RAS en CAS (ook tijd tussen active en read/write-commando )
+* T~rp~ = DRAM RAS Precharge: tijd tussen selecteren van twee rijen 
+* T~ras~ = Precharge delay: minimale tijd tussen actief worden en precharge van volgende rij.
+
+In elke leescyclus is zeker T~rcd~ en T~CL~ nodig. Indien bursts uit verschillende rijen nodig zijn, dan is ook Trp belangrijk.
+
+icon:globe[2x] Een goed achtergrondartikel dat dieper ingaat op timings en performantie van geheugen vind je http://www.anandtech.com/show/3851/everything-you-always-wanted-to-know-about-sdram-memory-but-were-afraid-to-ask/4[op de site van Ars Technica]
+
+ 
+.DDR-timing T~cl~=2 (bron: Micron)
+image::ch03/images/timing/TCL.png[alt="TCL", align="center"]
+
+
+.Voorbeeld 
+====
+PC3200 geheugen met parameters 2-2-2-6 heeft voor een burst met vier transfers van 8 bytes 2 + 2 + (4 x 0.5)=6 klokcycli van 200 MHz nodig. Dit geeft een snelheid van 1067 MB/s. Voor twee dergelijke opeenvolgende transfers zijn latexmath:[2(2 + 2 + 4 \times 0.5) + 2 = 14 ] klokcycli van 200 MHz nodig. Dit geeft 914 MBps.
+====
+
+Bij DDR kan ook het aantal cellen dat in een burst gelezen wordt variëren. Hetzelfde geheugen dat in een burst 8 transfers van 8 bytes uitvoert, haalt een snelheid van 1600MB/s.T~ras~ is in dit verhaal niet naar voor gekomen. Tras bepaalt de tijd waarin de volgende rij nog niet geladen mag worden. Deze moet groot genoeg zijn om de buffer niet te overschrijven voordat het volledig getransfereerd is over de databus. Deze parameter moet minimaal T~rcd~ +  T~CL~ + 1 bedragen. Indien de parameter te klein is gaat uiteraard data verloren. 
+
+Opvolgers van DDR zijn DDR2 en DDR3. Behalve verbeteringen op het vlak van klokfrequenties en spanningen (DDR2 en DDR3 gebruiken telkens lagere spanningen) is het grootste verschil dat het prefetch buffer vergroot. Bij DDR2 worden vier bits gebufferd, bij DDR3 acht. +
+DDR4, dat sinds kort beschikbaar is, verdubbelt dit *niet* nog eens , maar probeert de extra performantie vooral te halen uit hogere klokfrequenties en geoptimaliseerde signalering. Daarnaast geeft deze nieuwste specificatie ook de mogelijkheid om 3D-geheugen te gebruiken, waarbij meerdere lagen geheugen op elkaar kunnen gestapeld worden binnen dezelfde chips. <<CORS>>
+
+Het gevolg is dat deze geheugens nog sneller data naar buiten kunnen brengen (hogere maximale transfer), maar dat dit weer een hogere latentietijd met zich meebrengt. Hou wel in gedachten dat slechts een klein stukje van het geheugen aan deze hoge snelheid werkt. Intern wordt nog steeds een relatief lage snelheid gebruikt om de cellen te beschrijven, maar door de buffers kan data toch aan een dubbele (DDR), viervoudige (DDR2) of achtvoudige (DDR3) snelheid naar buiten gebacht worden.
+
+.DDR3 snelheden (bron: wikipedia)
+[format="csv",options="header"]
+|===
+Type geheugen,							Alternatieve naam,	kloksnelheid,	Theoretische bandbreedte
+PC3-10600 					DDR3 SDRAM,	DDR3-1333,		167 MHz,	10.667 GB/s
+PC3-11000 					DDR3 SDRAM,	DDR3-1375,		172 MHz,	11 GB/s
+PC3-12800 					DDR3 SDRAM,	DDR3-1600,		200 MHz,	12.8 GB/s
+PC3-13000 					DDR3 SDRAM,	DDR3-1625,		203 MHz,	13 GB/s
+PC3-14400 					DDR3 SDRAM,	DDR3-1800,		225 MHz,	14.4 GB/s
+PC3-14900 					DDR3 SDRAM,	DDR3-1866,		233 MHz,	14.933 GB/s
+PC3-15000 					DDR3 SDRAM,	DDR3-1866,		233 MHz,	14.933 GB/s
+PC3-16000 					DDR3 SDRAM,	DDR3-2000,		250 MHz,	16 GB/s
+PC3-17000 					DDR3 SDRAM,	DDR3-2133,		266 MHz,	17.066 GB/s
+PC3-17600 					DDR3 SDRAM,	DDR3-2200,		275 MHz,	17.6 GB/s
+PC3-19200 					DDR3 SDRAM,	DDR3-2400,		300 MHz,	19.2 GB/s
+PC3-21300 					DDR3 SDRAM,	DDR3-2666,		333 MHz,	21.3 GB/s
+PC3-24000 					DDR3 SDRAM,	DDR3-3000,		375 MHz,	24 GB/s
+|===
+
+
+Een belangrijke opmerking, die reeds gedeeltelijk aangehaald werd, is dat DDR, DDR2, DDR3 en DDR4 gebruik maken van een andere werkspanning. Deze wordt alsmaar lager om het gedissipeerd vermogen en de bijhorende warmteontwikkeling te verkleinen, wat nodig is om hogere kloksnelheden toe te laten. Bij DDR was dit nog 2,5 Volt, bij DDR4 is dit ondertussen verminderd tot 1.2 Volt <<CORS>>. +
+Bovendien hebben de modules ook een verschillend aantal aansluitpinnen, waardoor het duidelijk zal zijn dat ze niet compatibel zijn. 
+
+Om ongelukken te vermijden wordt daarom een andere behuizing gebruikt (inkeping in de module zit op een andere plaats).
+
+=== Optimalisatietechnieken
+De evolutie in DRAM technologie is er steeds op gericht om de maximale bandbreedte te verbeteren, terwijl bijzonder weinig aan de latentietijd werd gedaan. Deze verbeterde hooguit in absolute waarde, doordat de kloksnelheid verhoogde. Relatief gezien (dus uitgedrukt in klokcycli) is de latentietijd eerder gestegen. Uit het voorgaande zou al gebleken moeten zijn dat na elke rijtoegang een hersteltijd nodig is om de bufferrij(en) vrij te maken. 
+
+.normale geheugentoegang
+image::ch03/images/optimalisatie/MEMACCESS_normal.png[alt="", align="center", scaledwidth="75"] 
+
+
+==== Interleaving
+Een techniek die gebruikt kan worden om een deel van de dode tijd te vermijden, is interleaving. Meer bepaald gaat het dan om het vermijden van de tijd tussen twee rijen. +
+Deze hersteltijd kan vermeden worden indien de volgende operatie doorgaat op een andere geheugenmodule. Om dit te bereiken worden bij interleaving naburige geheugenblokken verdeeld over verschillende geheugenbanken, die onafhankelijk van elkaar (en dus zonder hersteltijd) aangesproken kunnen worden. Belangrijke opmerking hierbij is dat er enkel snelheidswinst kan zijn als er gewisseld kan worden tussen banken. Het is dan ook belangrijk dat de memory controller weet of er al dan niet gewisseld kan worden tussen banken, zodat hij al dan niet rekening kan houden met de hersteltijd. 
+ 
+.Memory interleaving
+image::ch03/images/optimalisatie/MEMACCESS_interleaving.png[alt="interleaving", align="center", scaledwidth="75"] 
+
+==== Dual channel
+Een andere heel eenvoudige techniek om de snelheid te verhogen is het vergroten van de databus. Dit brengt wel een paar problemen met zich mee. Eerst en vooral moeten er extra aansluitingen voorzien worden op zowel de geheugenmodule als het moederbord en bovendien moeten de signaallijnen ook voorzien worden op het moederbord. Daarnaast zal er, zeker bij steeds toenemende kloksnelheden, een probleem ontstaan van tijdverschillen tussen de verschillende datalijnen.
+
+Dual channel is een techniek die probeert de datasnelheid te verhogen door de databus naar de memory controller te verdubbelen, zonder de databus van de geheugenmodules te vergroten. Dit gebeurt weer door gebruik te maken van verschillende geheugenbanken. Elke geheugenbank heeft een databus van 64 bit, maar aangezien deze niet samenvallen is er een 128 bit databus naar de memory controller. De DIMM sockets op een moederbord zijn dus fysiek verbonden met één van de twee 64 bit kanalen. Uiteraard kan je enkel voordeel halen als geheugenmodules aangesloten zijn op de twee kanalen. 
+ 
+.geheugentoegang met Dual Channel
+image::ch03/images/optimalisatie/MEMACCESS_dualchannel.png[alt="dual channel", align="center",scaledwitdth="75"]
+
+Behalve het aanschakelen van meerdere modules is het dan ook belangrijk om ze in de juiste sockets te steken, zodat je beide kanalen gebruikt (en niet twee modules op hetzelfde kanaal). Moederborden met meerdere sockets op de kanalen, hebben overeenkomstige plaatsen op die kanalen die eenzelfde kleur hebben. Op deze manier zijn er dus matched sockets. Op deze matched sockets moet dus geheugen geïnstalleerd worden. 
+ 
+.dual channel sockets
+image::ch03/images/optimalisatie/Dual-channel_DDR_memory_use_6026.JPG[alt="dual channel memory placement", align="center", width=500] 
+
+
+Dit geheugen moet identiek zijn in capaciteit, anders zou een deel van het geheugen niet bereikbaar zijn in dual channel mode. Verder moeten de modules in principe niet gelijk zijn. Zelfs modules met verschillende snelheden zijn mogelijk, al zal dan tegen de traagste snelheid gewerkt worden. In principe betekent dit echter dat er in de praktijk wel problemen kunnen ontstaan, zodat moederbord fabrikanten het gebruik van identieke modules aanraden. Deze worden door verschillende geheugenfabrikanten ook aangeboden.
+
+Hoewel dual channel een veelbelovende techniek is, blijkt uit benchmarks dat de winst (ondertussen) toch marginaal is. Een deel van de verklaring hiervoor zou liggen in het cache geheugen, dat steeds groter en efficiënter wordt. Later zullen we zien dat de cache geheugens het snelheidsverschil tussen geheugen en processor moeten opvangen. Je kan trouwens zelf aan de berekeningen bij DDR al zien dat dual channel weinig invloed heeft, tenzij echt grote opeenvolgende stukken gelezen worden. Vergelijk de tijd die nodig is voor een burst van 4 transfers met die voor een burst van 8 transfers. Op een dual channel systeem zullen de bursts immers maar half zo groot zijn als bij single channel.
+
+==== Buffered/registered RAM en foutdetectie
+
+Een term die regelmatig terug te vinden is bij RAM geheugen is (un)buffered of registered. De termen buffered en registered hebben dezelfde betekenis. Op basis van de eerdere uitleg zou je kunnen vermoeden dat elk DRAM geheugen gebufferd is met de statische bufferrij. De term buffered slaat in dit geval niet op die statische rij, maar wel op de aanwezigheid van een extra bufferchip. Deze bufferchip doet dienst als elektrisch buffer/versterker tussen de geheugenIC’s en de rest van het systeem. Op die manier kan het bijvoorbeeld problemen met onvoldoende stroom helpen oplossen. De bufferchip is dikwijls te herkennen aan zijn dwarse plaatsing op de module. 
+
+Twee andere termen die je kan terugvinden zijn (non)ECC en parity. Beiden houden verband met het vermogen van het geheugen om fouten te laten detecteren. In het geval van pariteit wordt per byte een pariteitsbit berekend. Dit bit wordt mee verzonden. De ontvanger herberekent de pariteitsbit en vergelijkt het resultaat van zijn berekening met het ontvangen pariteitsbit. Indien ze verschillen is er een fout geweest en moet de transfer opnieuw gebeuren. 
+
+ECC werkt op gelijkaardige manier, maar maakt gebruik van een hash functie. Voordeel van deze manier van werken is dat meervoudige bitfouten gedetecteerd kunnen worden of dat enkelvoudige bitfouten gecorrigeerd kunnen worden. Pariteit kan enkel enkelvoudige bitfouten detecteren. Uiteraard kost deze foutcontrole ook rekenkracht en dus tijd. Door de betrouwbaarheid van moderne geheugens hebben deze technieken enkel zin in kritische toepassingen (bijvoorbeeld servers, procescontrole, ...)
+
+=== Cache geheugen
+
+Zelfs met alle optimalisatietechnieken blijft er een snelheidsprobleem. Instructies die de processor moet uitvoeren, zitten in het geheugen en als de snelheid waarmee het geheugen instructie kan leveren, vergeleken wordt met de snelheid waarmee de processor ze kan uitvoeren, blijkt die laatste een stuk sneller. 
+Een belangrijk verschil, want een processor kan nu eenmaal niet sneller instructies afwerken dan dat ze door het geheugen aangeboden kunnen worden. Sneller geheugen maken, ligt voor de hand. Zoals eerder al aangehaald is statisch geheugen sneller dan dynamisch geheugen. 
+
+Belangrijk nadeel van statisch geheugen is dat het per byte veel duurder is dan dynamisch geheugen. De hoeveelheid statisch geheugen in een computersysteem zal dus eerder klein zijn en het komt erop aan deze kleine hoeveelheid zo efficiënt mogelijk te gebruiken. Een tweede probleem is dat niet enkel de snelheid van het geheugen problemen geeft, maar ook de snelheid van de interface naar het geheugen. Om dit probleem aan te pakken was er ooit een snelle back-side bus die de verbinding met het cache geheugen verzorgde. Ondertussen zijn er al verschillende niveaus van cachegeheugens in de processor geïntegreerd, zodat de verbinding met dit geheugen ook in de processor zelf zit en daardoor veel sneller kan zijn.
+
+==== Werking
+
+.Cache als buffer tussen CPU en geheugen
+image::ch03/images/cache.png[alt="cache als buffer", align="center", scaledwidth="30"] 
+
+Het cache geheugen vormt een buffer die het snelheidsverschil tussen het geheugen en de CPU moet opvangen. Aangezien het cache geheugen een stuk kleiner zal zijn dan het dynamisch geheugen, komt het erop aan om de nodige gegevens klaar te hebben zitten in het cache geheugen. 
+
+Om dit te realiseren wordt weer uitgegaan van het lokaliteitsprincipe. Zowel het cache geheugen als het hoofdgeheugen worden onderverdeeld in blokken van dezelfde grootte. De blokken in het cache geheugen (cache lines) kunnen een kopie bevatten van een blok uit het hoofdgeheugen. 
+
+Een leescyclus verloopt als volgt: 
+
+. de processor vraagt een adres 
+. Indien dat adres in een blok ligt dat in de cache te vinden is, wordt er gesproken van een cache-hit en heeft er een snelle leescyclus plaats vanuit de cache. 
+. In het andere geval (een cache-miss) wordt via een trage leescyclus het gevraagde woord opgehaald uit het centrale geheugen terwijl ook onmiddellijk het blok waarin dit woord zich bevindt naar de cache gekopieerd wordt.
+
+Aangezien opeenvolgende geheugentoegangen meestal op naburige adressen doorgaan, is de kans groot dat een volgende toegang een cache-hit geeft en dus snel verwerkt kan worden. +
+Een belangrijke parameter voor de snelheid van het cache geheugen is dus de hitrate. Dit is het percentage geheugentoegangen dat rechtstreeks via het snelle cache geheugen kan verlopen. De hitrate ligt typisch tussen 80 en 99%. 
+
+Een schrijfcyclus kan gelijkaardig verlopen, maar er stelt zich wel een nieuw probleem. +
+In het geval van een schrijfcyclus worden er immers gegevens aangepast. Indien er een cache-hit is, lijkt het logisch om de inhoud van het cache geheugen aan te passen en pas later (bij het verwijderen van de cacheline) wordt de inhoud van het hoofdgeheugen aangepast. Deze manier van werken heet *write-back cache*. +
+Belangrijk nadeel hiervan is dat op een bepaald ogenblik de inhoud van het hoofdgeheugen niet consistent is met het cache geheugen. Dit kan bijvoorbeeld bij DMA-toegangen problemen opleveren. Tweede nadeel is dat het wegschrijven naar het geheugen gebeurt op het ogenblik dat de pagina uit het cache geheugen verwijderd wordt. Dit is het ogenblik waarop in het cache geheugen plaats gemaakt wordt voor een nieuwe pagina. Dit vertraagt dus het inladen van de nieuwe pagina. 
+
+Een alternatief is gebruik maken van *write through cache*. In dit geval worden steeds zowel het hoofdgeheugen als het cache geheugen aangepast. Nadeel is duidelijk dat steeds gebruik gemaakt wordt van het tragere hoofdgeheugen. 
+
+Dit kan gedeeltelijk opgevangen worden doordat de processor niet moet wachten tot de volledige cyclus is afgewerkt, maar bij opeenvolgende schrijfopdrachten zal het toch leiden tot vertragingen. Bij schrijfcycli zijn er nog verschillen mogelijk: write allocate en write no-allocate. Bij write allocate zal bij een cache miss het geheugenblok in het cache geheugen geladen worden, bij *write no-allocate* niet.
+ 
+Het voordeel is dat een schrijfoperatie naar het geheugen typisch sneller is dan het ophalen van een volledig blok. Bijvoorbeeld bij write-through geheugen is makkelijk in te zien dat het interessant kan zijn om het blok niet volledig in te laden.
+
+==== Soorten caches
+
+Er zijn een aantal onderscheiden te maken tussen cache geheugens. Een eerste belangrijk verschil is dat tussen level 1 en level 2 caches. In principe zijn zelfs nog meer niveau’s van cache geheugens mogelijk. 
+L1 cache is het cache geheugen dat het dichtst bij de processor staat. Het moet dan ook het snelste geheugen zijn, zodat het de processor kan volgen. Naarmate de snelheid van de processor toeneemt, werd het verschil in snelheid zo groot dat het interessant werd om een tweede niveau buffer in te zetten. Dit geheugen is minder kritisch op het vlak van snelheid (het moet de processor niet rechtstreeks voorzien van gegevens) en kan dus op andere vlakken geoptimaliseerd worden. Zo zal L2 cache typisch minder snel, maar wel een stuk groter zijn. 
+
+Een ander verschil tussen cache geheugens is dat L1 cache dikwijls opgedeeld worden in data cache en instructie cache. Hiervoor zijn verschillende redenen te bedenken. Een belangrijke reden is dat met pipelining, een deel van de processor (instruction fetch unit) instructies ophaalt en tegelijkertijd een ander deel (operand fetch) gegevens ophaalt om de bewerkingen uit te voeren.
+
+Als beide geheugens gescheiden zijn, kunnen de twee units onafhankelijk van elkaar hun operaties uitvoeren. Anderzijds kunnen de cache geheugens ook geoptimaliseerd worden. Zo zal een processor nooit wijzigingen aanbrengen in de instructies die hij uitvoert. Voor de instructiecache moeten geen voorzieningen getroffen worden voor schrijfoperaties.
+
+==== Overschrijfstrategieën
+
+Bij een cache miss zal in de meeste gevallen een volledig geheugenblok ingeladen worden. Dit betekent dat in het cache geheugen plaats zal moeten gemaakt worden. Er zal met andere woorden een lijn geselecteerd moet worden, die uit het cache geheugen verwijderd zal worden. Het selecteren van die lijn moet uiteraard doordacht gebeuren om de hit rate zo hoog mogelijk te houden. In principe is het best om de cacheline te verwijderen die het langst niet zal gebruikt worden. Het probleem met deze keuze is dat er kennis over de toekomst voor nodig is. In plaats daarvan zijn er een aantal strategieën die op een andere manier proberen de meest geschikte lijn te selecteren:
+
+First In First Out (FIFO):: selecteert de lijn die al het langst in het cachegeheugen zit. Het is een erg eenvoudig te implementeren techniek, aangezien de lijnen eigenlijk gewoon cyclisch overschreven worden. Deze techniek is daarentegen weinig efficiënt op het vlak van het optimaliseren van de hitrate. Een lang geleden, maar veel gebruikte lijn zal bijvoorbeeld eerder verwijderd worden dan een lijn, waar maar een keer data uit gelezen wordt, maar die wel later is ingeladen.
+
+Least Recently Used (LRU):: selecteert de lijn die al het langst niet meer gebruikt wordt. De kans dat deze lijn dan plots weer gebruikt zal worden, is een stuk kleiner dan bij FIFO. Hierdoor zal deze techiek leiden tot een hogere hitrate. Nadeel is dan weer dat er een pak meer bij komt kijken om bij te houden welke lijn geselecteerd wordt. Deze berekening kost zowel geld (om te implementeren) als tijd (om de lijn te selecteren). In het bijzonder als uit een groot aantal lijnen gekozen moet worden, is het gebruik van deze techniek niet aangewezen.
+
+Least Frequently Used (LFU):: deze techniek zal de lijn selecteren die het minst frequent gebruikt wordt. De techniek haalt gelijkaardige resultaten als LRU, maar heeft ook dezelfde nadelen. 
+
+Adaptive Replacement Cache (ARC):: combineert zowel LRU als LFU. Hierdoor worden nog betere resultaten gehaald op het vlak van hitrate, maar de bewerkingen en de implementatie ervan worden anderzijds ook complexer.
+
+Random:: selecteert willekeurig een lijn. Dit is een eenvoudige te implementeren techniek, die toch aanvaarbare resultaten haalt, in het bijzonder als er een groot aantal lijnen zijn waaruit geselecteerd moet worden. Deze techniek wordt soms gecombineerd met LRU, door een bit te koppelen aan een lijn. Dit bit geeft aan of de lijn al gebruikt is. Als alle lijnen gebruikt zijn, worden alle bits weer gereset. Als dan een lijn gekozen moet worden, zal random geselecteerd worden uit alle lijnen die gemarkeerd zijn als “niet gebruikt”.
+
+=== Associativiteit
+De associativiteit van het cache geheugen bepaalt op welke cachelines een welbepaald geheugenblok terecht kan komen. De associativiteit bepaalt dus ook het aantal lijnen waaruit geselecteerd kan worden en bepaald dus zowel rechtstreeks (beperking van lijnen) als onrechtstreeks (welke overschrijfstrategie) mee de hitrate.
+
+==== Fully Associative cache
+ 
+.principe fully associative cache
+image::ch03/images/associativiteit/fullyassociative.png[alt="", align="center", scaledwidth="50"] 
+
+Bij fully associative cache kan een blok uit het geheugen terecht komen in gelijk welke cacheline. Om te kunnen bepalen welk geheugenblok in een bepaalde cacheline zit, wordt een elke cacheline een tag gekoppeld. Deze is nodig om te kunnen bepalen of het blok aanwezig is in het cache en eventueel de juiste cacheline te kunnen selecteren. 
+ 
+.voorbeeld fully associative geheugen
+image::ch03/images/associativiteit/vbfully.png[alt="", align="center", scaledwidth="70"] 
+
+Een voorbeeld zie je in bovenstaande afbeelding. +
+De processor beschikt over een 32-bit adresbus en een cache geheugen van 16kB met cachelines die 64-byte breed zijn. Om binnen elke cacheline het juiste byte te selecteren zijn er 6 bits nodig. +
+Hiervoor worden uiteraard de minst significante gebruikt. De overige 26 bits worden gebruikt om de inhoud van de cacheline te identificeren. Je zou dit kunnen zien als het nummer van het geheugenblok. Merk immers op dat voor elk byte van een geheugenblok, deze 26 bits van het adres steeds overeenkomen. Het zijn dan ook deze bits die opgeslagen worden in de tag. Naast de cachelines en de tags die eraan gekoppeld zijn, zijn er een aantal comperatoren voorzien. Bij het begin van een cyclus worden deze comperatoren gebruikt om de bovenste 26 bits van het adres te vergelijken met de inhoud van de tags. Indien de uitkomst van een van de comperatoren een gelijkheid aangeeft, is er een cache-hit en is meteen ook de juiste cacheline geselecteerd.
+
+In het voorbeeld zijn er 256 tags van 26 bits elk (6656 bits) die vereist zijn naast de data-cache. Dit komt neer op bijna 5% van de cache-capaciteit.  
+Vermits elke pagina uit het geheugen in om het even welke cache-line geplaatst kan worden, kan de cache optimaal benut worden. Bovendien kan gebruikt gemaakt worden van de optimale overschrijfstrategie. Het nadeel van associative cache is dat het een vrij dure implementatie is. Er is immers behoefte aan veel supersnel geheugen om de tags te implementeren. 
+Daarnaast moeten ook de snelle comparatoren gerealiseerd worden. Binnen de tijd van een cyclus moet immers geweten zijn of er een cache hit is. 
+
+Fully associative cache geeft goede resultaten. Indien deze techniek dan ook nog gecombineerd wordt met de meest complexe overschrijfstrategieën, wordt het geheel extreem complex en duur. Zoals al aangehaald bij de overschrijfstrategieën is hier het aantal lijnen meestal te groot om gebruik te maken van LRU, LFU of ARC, zonder daarvoor een andere prijs te betalen.
+
+
+==== Direct mapped cache
+ 
+.principe direct mapped cache
+image::ch03/images/associativiteit/directmapped.png[alt="", align="center", scaledwidth="50"] 
+
+Bij direct mapped cache kan elk geheugenblok slechts in één cacheline terecht. Dit maakt dat overschrijfstrategieën overbodig zijn, er is namelijk maar een plaats waar het geheugenblok terecht kan en de inhoud van die cacheline zal verwijderd worden. Evident nadeel is dat als er geen keuze mogelijk is, de optimale keuze niet gemaakt kan worden. Deze manier van werken heeft dus een negatief effect op de hitrate. +
+Om dit te staven met een extreem voorbeeld: bij direct mapped cache is het mogelijk dat een cacheline plaats moet maken voor een andere, terwijl een deel van het cache nog niet in gebruik is. Doordat een geheugenblok maar op een lijn terecht kan, worden de tags kleiner en is er ook slechts een comparator nodig.
+ 
+.voorbeeld direct mapped
+image::ch03/images/associativiteit/vbdirectmapped.png[alt="", align="center", scaledwidth="70"] 
+
+Een voorbeeld zal dit verduidelijken... 
+De processor beschikt overeen 32-bit adres bus en een cache geheugen van 16kB met cachelines die 64-byte breed zijn. Naast de zes bits die nodig zijn om een byte binnen de cacheline te  selecteren, zijn er nu ook acht bits nodig om een van de 256 (=16kB/64B) lijnen te selecteren. Op die manier blijven er maar 18 bits over voor de tag. Dit soort cache-organisatie is dus veel goedkoper en eenvoudiger dan de vorige: er is slechts 1 comparator (van 18 bits) nodig, en het tag-gedeelte is ook kleiner: 256 x 18 bits (4608 bits, 3,4%). Dit soort cache wordt toegepast op plaatsen waar de snelheid minder kritisch is, met andere woorden in de caches die verder van de processor staan.
+
+==== Set-associative cache
+ 
+.principe set-associative cache
+image::ch03/images/associativiteit/setassociative.png[alt="", align="center", scaledwidth="70"] 
+
+Set-associative cache is de tussenvorm. Hierbij worden de cachelines gegroepeerd in sets. Elk geheugenblok kan terecht in slechts een set, maar binnen die set kan het in elke cacheline terecht. 
+
+.voorbeeld set associative
+image::ch03/images/associativiteit/vbsetassociative.png[alt="set associative voorbeeld", align="center", scaledwidth="20"] 
+
+.voorbeeld
+====
+Een voorbeeld: een processor met een 32-bit brede adresbus en 16kB 4-way set associative cache geheugen met cachelines van 64 byte. 4-way betekent dat een set bestaat uit vier cachelines. De 256 lijnen worden nu verdeeld in 256/4=64 sets.
+
+Zes bits zijn nog steeds nodig om een byte in de cache line te selecteren. Daarnaast zijn er nu een aantal bits nodig om een set te kiezen. Aangezien er 64 sets zijn, zijn er hiervoor zes bits nodig. De resterende bits (20) worden gebruikt voor de tag. Als nu een adres aangeboden wordt, wordt een set van vier lijnen geselecteerd en worden de vier tags vergeleken met de meest signicante bits van het adres. Als één van de tags gelijk is aan deze bits is er een cache hit. 
+====
+
+.voorbeeld
+====
+Rekenvoorbeeld (meer voorbeelden vind je in <<PATT2>> en <<RAMA2>>)
+
+*Opgave:*
+Een 4-way set associative cache heeft een grootte van 64KB. De CPU werkt met 32-bit addressering, elk geheugenwoord bevat 4 bytes. Elke cache-line bevat 16 bytes. De cache gebruikt een write-through policy.
+Bereken de totale benodigde hoeveelheid geheugen (geheugen+tags) die nodig is om dit te implementeren…
+
+*Antwoord:*
+
+het aantal bits is een adres is 32 (latexmath:[a]) +
+Een cacheline omvat 16 bytes, wat betekent dat de vier (latexmath:[b]) LSB’s niet moeten geadresseerd worden. +
+Het aantal sets is dan latexmath:[\dfrac{64\text{ KB}}{4 \times 16} = 1024] (latexmath:[c]) +
+Het aantal bits dat nodig is om deze te kunnen adresseren: latexmath:[\log_2 1024= 10 bits ] (latexmath:[d]) + 
+Het aantal tag bits wordt dan: 
+
+[latexmath]
+++++
+32 – b – d &=x \\
+32 - 4 - 10&= 18 bits
+++++
+Om de totale grootte dan te berekenen kan je redeneren: +
+
+* Elke cachelijn heeft 16 bits data, en een tag van 18 bits. Dit komt op een totaal van 146 bits.
+* Dit moet je met vier vermenigvuldigen (‘4’-way) en met het aantal sets (d), wat resulteert in 598016 bits.
+
+Het percentage overhead is dus (totaal benodigde bits)/('nuttige' bits)   of 14%
+====
+
+NOTE: bereken aan de hand van vorig voorbeeld hoe de overhead zich gedraagt bij 8-way en 16-way cache geheugen.
+
+Zoals al gezegd is set associative de tussenvorm. Eigenlijk kan je zeggen dat fully associative cache ook set associative cache is, maar met slechts één set. Direct mapped cache is anderzijs set associative met slechts één lijn per set. +
+De eigenschappen van set associative liggen dan ook tussen de twee vormen in. +
+Het laat minder mogelijkheden voor het kiezen waar een cacheline terecht kan dan fully associative, maar meer dan direct mapped. Anderzijds heeft het minder bits nodig voor de tags en ook minder comparatoren dan bij fully associative cache. Vergeleken met direct mapped is het dan weer complexer. 
+Meer algemeen geldt dat naarmate de associativiteit toeneemt er meer keuze is in de cache lijnen, maar dat de kost die hieraan verbonden is ook hoger wordt. Omwille van de beperking van het aantal cachelines in een set is set-associative cache gemakkelijker te combineren met betere overschrijfstrategieën. Mede daardoor is fully associative cache een eerder zeldzame vorm van cache.
+
+WARNING: In literatuur worden de termen ‘cache line’, ‘cache block’, ‘cache entry’ en ‘cache set’ vaak door elkaar gebruikt.
+
+==== Snelheid van de cache
+
+In het voorgaande hebben we reeds een aantal eigenschappen aangehaald die mee de efficiëntie van het cache geheugen bepalen. Dit is uiteraard een heel belangrijke eigenschap, aangezien bij cache hits, de processor aan zijn volle snelheid kan werken.
+ 
+.cache misses in functie van grootte en associativiteit (bron: wikipedia)
+image::ch03/images/associativiteit/400px-Cache_missrate.png[alt="cash miss-rate",align="center",scaledwidth="50"]
+
+In bovenstaande afbeelding toont een grafiek het aandeel missers in functie van de grootte van het cache geheugen en dit voor verschillende associativiteit. 
+Een deel van de missers zijn onvermijdelijk. Het zijn de zogenaamde coldstart misses, die afkomstig zijn van de eerste keer dat toegang tot een blok gezocht wordt. 
+Een tweede deel hangt samen met de capaciteit. Dit neemt duidelijk af naarmate het cache geheugen groter wordt. 
+Een derde deel hangt samen met de associativiteit. In deze grafiek komt duidelijk naar voor dat met toenemende associativiteit het aantal missers afneemt. Naast de hitrate zijn er nog een aantal andere eigenschappen, die samen de snelheid van het volledige geheugen bepalen.
+
+Deze eigenschappen zijn:
+
+Hit time:: de tijd nodig om bij een hit de gegevens op te halen.
+Miss time:: de tijd nodig om bij een miss het nieuwe geheugenblok te laden en de gevraagde gegevens beschikbaar te maken 
+Miss penalty:: de extra tijd die nodig is bij een cache miss (eigenlijk misstime-hit time)
+Hit rate:: percentage toegangen die rechtstreeks langs de cache gaan
+
+De formule voor de totale toegangstijd van de gecombineerde caches is dan:
+
+[latexmath]
+++++
+t_{totaal}=HR_{L1} \times t_{L1}  + (1 - HR_{L1}) \times HR_{L2}  \times t_{L2}  + (1 - HR_{L1}) \times (1 - HR_{L2}) \times t_{RAM}
+++++
+
+Waarbij: + 
+HR = hitrate +
+t = aantal cycli +
+
+.Voorbeeld
+====
+Een computer heeft een L1-cache, toegangstijd 1 ns en een hitrate van 96%. De L2 cache heeft een hitrate van 88 % bij een toegangstijd van 2 ns. Het externe geheugen heeft een toegangstijd van 8 ns.
+De gemiddelde toegangstijd wordt dan:
+
+[latexmath]
+++++
+0.96 \times 1 \text{ ns} + 0.04 \times 0.88 \times 2 \text{ ns} + 0.04 \times 0.12 \times 8 \text{ ns} = 1.0688 \text{ ns}
+++++
+
+Probeer zelf eens uit wat de invloed is van de toegangstijd van het RAM-geheugen in dit systeem. +
+Probeer eens wat er gebeurt zonder L2 cache. De verschillende factoren worden niet op dezelfde manier beïnvloed door de eigenschappen van het cache. Bijvoorbeeld de asscociativiteit van de cache biedt meer mogelijkheden op het vlak van cachelines selecteren, waardoor de hitrate hoger kan zijn. Daar staat tegenover dat een complexere berekening nodig is om een lijn te selecteren, waardoor bij een cache miss er extra tijd verloren gaat (hogere miss time).
+====
+
+Een ander voorbeeld zijn de grootte van de cachelines. Grotere cachelines geven in eerste instantie een hogere hit rate, omdat meer naburige gegevens gekopieerd worden. +
+Anderzijds zijn grotere cachelines nefast voor de miss time. Bij heel grote cachelines zal bovendien zelfs de hitrate dalen, omdat lijnen te snel uit het cachegeheugen verdwijnen (omdat bij dezelfde grootte er nu eenmaal minder lijnen zijn).
+
+Een groter cachegeheugen geeft dan weer meer cachelines. Mits een goede overschrijfstrategie toegepast wordt en de associativiteit hoog genoeg is, kan de hit rate toenemen. Nadeel is dat de selectie van een lijn dan weer complexer wordt waardoor de miss time weer toeneemt.
+
+=== Virtueel geheugen
+Virtueel geheugen is een oplossing om het tekort aan fysiek geheugen op te lossen. Het tekort aan geheugen komt van steeds groter wordende toepassingen en bestanden die bewerkt worden. Bovendien worden ook verschillende programma’s naast elkaar uitgevoerd. Toch zijn er vandaag ook een aantal situaties waarin een computer ruim voldoende heeft met het fysieke geheugen. In dat geval biedt virtueel geheugen weinig meerwaarde.
+
+==== Werking
+Virtueel geheugen zal gebruik maken van de beschikbare ruimte op een of ander medium voor massaopslag om het geheugen groter te laten lijken.
+
+Meestal zal het gebruikte medium een harde schijf zijn. We zullen hier in het volgende van uitgaan. +
+Op de harde schijf zal ruimte voorzien worden die gebruikt wordt als swapruimte. Het kan een swap-file zijn of een swap-partitie. Indien de processor toegang wil tot een bepaald adres, zal aan de hand van het adres nagegaan worden of de gevraagde gegevens aanwezig zijn in het fysieke geheugen. Indien de gegevens in het fysieke geheugen zitten, worden ze opgehaald en wordt de instructie gewoon verder afgewerkt. Als de gegevens niet in het fysieke geheugen zitten, treedt er een page fault op. Dit is een speciale exceptie. De processor wordt met andere woorden onderbroken en zal de exceptieroutine uitvoeren. In dit geval gaat het om een roll-back exception. De processor zal eerst terugkeren naar de toestand vlak voor de uitvoering van de instructie, die het probleem veroorzaakte en vervolgens de exception handler uitvoeren. De exception handler zal indien nodig plaats maken en vervolgens de nodige gegevens verplaatsen naar het fysieke geheugen. Uiteraard zal het hier niet gaan over een byte, maar wel over een groter stuk geheugen. We zullen later terugkomen op de grootte van dit geheugenblok.
+ 
+.Page-faults bij opstarten software
+image::ch03/images/pagefaults.png[alt="pagefaults", align="center", scaledwidth="50"]
+
+Na de uitvoering van de handler keert de processor terug naar de toestand bij de oproep van de handler. Dit is uiteraard de instructie die in eerste instantie het probleem veroorzaakte. Deze keer zal bij de uitvoering van die instructie blijken dat de gegevens beschikbaar zijn in RAM. 
+
+Om virtueel geheugen te ondersteunen is, naast het opslagmedium, ook een processor nodig die de roll-back exception ondersteund. Daarnaast moet ook het besturingssysteem de nodige routines omvatten en tenslotte is er ook behoefte om bij te kunnen houden waar de gegevens zich bevinden (fysiek geheugen of swap). 
+
+Belangrijk is ook dat bepaalde delen nooit mogen verdwijnen uit het fysieke geheugen. Een voorbeeld daarvan is de handler: als die op de swap staat, is er geen routine meer beschikbaar om hem naar het fysiek geheugen te verplaatsen.
+
+==== Paging - segmenting
+De meest gebruikte manier om met virtueel geheugen te werken, is zowel de swap als het fysieke geheugen te verdelen in stukken van dezelfde grootte. Zo’n blok wordt dan een pagina genoemd. Voor elke pagina zou dan in een tabel opgeslagen kunnen worden waar de pagina zich bevindt. In deze tabel zou dan een bit aangeven of het fysiek dan wel virtueel aanwezig is en de andere bits zouden de locatie kunnen aanduiden. Uiteraard moet deze tabel ook ten allen tijde in het fysiek geheugen aanwezig blijven. Soms is het noodzakelijk om de grootte van deze tabel te beperken. 
+ 
+.Paging table (Wikimedia Commons, BSD)
+image::ch03/images/2000px-Virtual_address_space_and_physical_address_space_relationship.svg.png[alt="", align="center", scaledwidth="50"] 
+
+.Voorbeeld 
+====
+Op een 32-bit processor met pagina’s van 4kB is een tabel nodig van 4MB (op voorwaarde dat de elementen van de tabel 32 bit groot zijn).
+
+Om de tabellen klein te houden kan gewerkt worden met meerdere niveaus van tabellen. In het reeds aangehaalde voorbeeld zouden er 1024 tabellen van 4kB nodig zijn. Deze tabellen bevinden zich op het tweede niveau. Op het eerste niveau is er een tabel van 4kB, die toelaat een van de 1024 secundaire tabellen te selecteren.
+
+Een groot voordeel is dat het enkel de eerste niveau tabel aanwezig moet zijn in het fysieke geheugen. De secundaire tabellen kunnen zich in de swapruimte bevinden. + 
+Het alternatief voor paging is werken met segmenten. In grote lijnen is het verhaal hetzelfde, er is bijvoorbeeld ook een tabel die bijhoudt waar de segmenten zich bevinden. Het grote verschil is dat de gegevens nu niet opgedeeld worden in pagina’s van gelijke grootte. Het grootste gevolg hiervan situeert zich op het vlak van geheugenfragmentatie. Bij het vervangen van geheugenpagina’s of segmenten is er nu extra tijd (traagheid van harde schijf laat complexe berekeningen toe). Er kan dus een optimale keuze gemaakt worden. Bij segmentering kan het gebeuren dat een groot segment vervangen wordt door een veel kleiner segment, waardoor een stuk van het geheugen niet in gebruik zou zijn. Dit soort fragmentatie heet externe fragmentatie.
+
+Bij paging gebeurt dit uiteraard niet. Daar worden immers pagina’s van gelijke grootte vervangen. Bij paging kan wel interne fragmentatie optreden. In feite worden de gegevens van een segment verdeeld in pagina’s van 4kB. Voor een bestand van 13kB geeft dit drie volledig gevulde pagina’s en een pagina met 3kB ongebruikte ruimte.
+====
+
+==== Snelheid en virtueel geheugen
+Virtueel geheugen heeft de reputatie om de computer te vertragen. Hoewel dit strikt genomen wel waar kan zijn, klopt dit niet helemaal. De reputatie komt namelijk van het swappen van gegevens naar de harde schijf. Aangezien de harde schijf een stuk trager is dan het RAM, gaat dit uiteraard een stuk trager dan gewoon lezen van gegevens uit het RAM. 
+
+Dit is echter geen eerlijke vergelijking. Indien de swap ruimte niet gebruikt zou kunnen worden, zou er gewoon onvoldoende geheugen beschikbaar zijn om in deze situatie te komen. De gebruiker zou zelf bestanden of programma’s moeten afsluiten om te kunnen doen wat het swappen veroorzaakte. Het gebruik van virtueel geheugen biedt de gebruiker dus in eerste instantie extra mogelijkheden. Als die extra mogelijkheden gebruikt worden, gaat dat inderdaad trager. 
+
+Los daarvan kan het gebruik van virtueel geheugen wel vertraging geven. Een eerste evidente reden is dat in plaats van een adres gewoon op te zoeken in het geheugen, nu het adres eerst opgezocht moet worden in twee tabellen, alvorens de eigenlijke operatie kan doorgaan. Aangezien de tabel in het geheugen zit, zijn er dus drie geheugentoegangen nodig om een gegeven te manipuleren. Dit probleem wordt grotendeels opgelost door een Translation Lookaside Buffer. Dit is een snel soort cachegeheugen in de processor waar de meest recent gebruikte fysieke adressen opgeslagen worden. De hitrate van dit buffer ligt weer bijzonder dicht bij 100%, zodat deze vertraging vrijwel geen probleem meer is. 
+
+Een tweede vertraging kan ontstaan als het besturingssysteem onnodig voorbereidingen treft om een toekomstige swap-operatie te versnellen. Zoals daarnet vermeld is swappen een trage operatie. Bovendien moet eerst een pagina geswapt worden naar de harde schijf, waarna de gevraagde pagina in het fysieke geheugen geladen kan worden. Dit betekent tweemaal 4kB verplaatsen naar en van de harde schijf. +
+Om op het ogenblik dat er gegevens uit de swap-ruimte nodig zijn, de transactie te versnellen, kan het besturingssysteem proberen om op de achtergrondpagina’s te zoeken die waarschijnlijk niet onmiddellijk gebruikt zullen worden en deze dan al naar de swap te verplaatsen.
+
+Als dan gegevens uit de swap nodig zijn, kan dat met een 4kB verplaatsing van de harde schijf. Het kan natuurlijk gebeuren dat de verplaatste pagina’s toch eerder nodig zijn dan dat er een swapping nodig is. In dat geval zullen de verplaatste pagina’s, wanneer ze terug nodig zijn, uit de swap moeten gehaald worden. +
+Hierdoor reageert de computer trager dan in het geval er geen virtueel geheugen zou zijn.
+
+=== Bronvermelding bij dit hoofdstuk
+[Bibliography]
+- [[[PATT1]]] 'Computer Organization And Design'. David A. Patterson, John L. Hennessey. fifth edition. p374
+- [[[CORS]]] 'DDR4 White paper', Corsair, http://www.corsair.com/~/media/Corsair/download-files/manuals/dram/DDR4-White-Paper.pdf
+- [[[PATT2]]] 'Computer Organization And Design'. David A. Patterson, John L. Hennessey. fifth edition. p409
+- [[[RAMA2]]] 'Computer Systems'. Umakishore Ramachandran, William D. Leahy Jr. Pearson Education, 2011. p419
+
+
+

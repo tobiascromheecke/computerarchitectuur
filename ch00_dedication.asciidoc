@@ -1,0 +1,26 @@
+[preface]
+== Over deze cursus
+
+Dit lesmateriaal werd opgesteld doorheen de jaren, met tal van auteurs. Dhr Sven Sanders en Dhr Johan Donne verdienen daarbij een speciale vermelding, omdat zij de fundamenten van deze informatiebron reeds jaren geleden gelegd hebben. 
+
+Er werd in deze cursus gepoogd om steeds correct om te gaan met materiaal van externe bronnen, inzake copyrights en bronvermelding. Mocht je toch een fragment of afbeelding vinden zonder correcte bronvermelding, geef dat dan zeker door. +
+Stuur hiervoor zeker een mailto:roel.vansteenberghe@odisee.be[mailtje]. Er zal meteen het nodige gedaan worden om de situatie recht te zetten.
+
+Dit lesmateriaal is een collectieve inspanning geworden. Talloze studenten dienden reeds verbeteringen of aanvullingen in, en hopelijk kan dat ook in de toekomst blijven gebeuren. Als je niet goed weet hoe je daar aan begint, bekijk dan zeker dit videootje eens:
+
+.video met uitleg over toevoegingen aan deze cursus
+video::km0_pgpPMeM[youtube, align=center, width="480", height="360"]
+
+Daarbij een speciaal woordje van dank voor de studenten die in het academiejaar 2014-2015 reeds aanvullingen of correcties voorstelden via een pull request in github: 
+Mattisdr, HaroenV, brentvb, vincentvdh9, Bram-Vdb, JonathanMairesse, r0578281, jensvancauwenbergh, wietsevluymans95, robby5, eliasmeire, DeReuC, TimonVanderStraeten, Mike1401, Jonathan-de-baerdemaeker, wolf-philips, TommieGent1980, OwenHoward, GiovanniMichiels, Jens1996, Maliek, AndreasBackx, LouisDevreese, emiel-heughebaert, KennyBlanckaert, JeroenCoppieters, BrentTimmermans
+
+== Licentie
+
+Hergebruik van het materiaal is dan ook toegelaten, maar wel onder voorwaarden:
+
+* Het materiaal, of fragmenten ervan, mogen niet commercieel beschikbaar gesteld worden zonder uitdrukkelijke en schriftelijke toestemming van de auteur.
+* De inhoud aanpassen mag, maar dan op voorwaarde dat de aanpassingen ook publiek beschikbaar worden gesteld. Bij voorkeur gebeurt dit online (met een pull request op Github), zodat iedereen mee kan genieten van de verbeteringen.
+
+
+
+Concreet betekent dit dat al het materiaal onder de http://creativecommons.org/licenses/by-nc-sa/4.0/deed.nl[Creative Commons Naamsvermelding-NietCommercieel-GelijkDelen 4.0 Internationaal-licentie] valt, tenzij anders gespecifieerd.

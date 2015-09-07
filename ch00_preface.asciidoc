@@ -1,0 +1,21 @@
+[preface]
+== Voorwoord ==
+
+Als iemand van de buitenwereld je de komende jaren vraagt wat je precies gestudeerd hebt, of wat je doet als werk, dan zal je antwoord vaak ‘iets met computers’ zijn. Soms is dat nu eenmaal de makkelijkste manier om je er vanaf te maken. Tegenwoordig zijn computers, tablets, smartphones en andere devices immers zo gewoon, dat ze bijna thuis horen in het rijtje van basisbehoeften als stromend water, elektriciteit en TV. Als gebruiker van deze toestellen moet je al lang niet meer weten hoe je een hardware-upgrade moet uitvoeren, of hoe zo'n toestel werkt.
+
+Toch blijft het belangrijk voor jullie als aanstormende ict'ers om te weten wat er onder de motorkap van je devices en gadgets schuilt. Die achtergrondkennis is onontbeerlijk om later efficiënt problemen op te lossen of producten (in de breedste zin van het woord) van goeie kwaliteit af te leveren. Zelfs wie zich later zal toespitsen op softwareontwikkeling, zal efficiënter kunnen werken als hij ook snapt wat achter de schermen gebeurt.
+
+Deze cursus probeert je een overzicht te geven van de interne keuken van een moderne computer terwijl de cursus processorarchitectuur later iets dieper ingaat op de werking van het kloppend hart ervan.
+
+Uiteraard zijn twaalf lessen veel te weinig om alle onderdelen tot op het bot uit te benen. Daarom kan ik enkele standaardwerken aanbevelen, die zeker een bron van inspiratie vormden voor deze cursus. De boeken van William Stallings <<STALLINGS>> en Umakishore Ramachandran <<RAMA>> verdienen zeker je aandacht.
+
+
+Een overzicht van de werkvormen die bij dit vak gebruikt worden, vind je terug in de ECTS fiche. Deze kan je vinden op http://onderwijsaanbod.odisee.be[onderwijsaanbod.odisee.be]
+
+
+
+Veel succes met deze cursus!
+
+
+
+Roel Van Steenberghe 

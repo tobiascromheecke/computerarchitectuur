@@ -1,0 +1,103 @@
+
+== Opstartroutine
+===	Geheugens voor opstartroutinge 
+
+Een processor kan bij het opstarten enkel spreken met geheugen. Om een besturingssysteem te laden op een harde schijf is dus een tussenstap nodig. 
+Dit geheugen mag uiteraard niet volatiel zijn.
+
+Er zijn verschillende soorten ROM geheugens die momenteel nog relevant zijn:
+
+MROM:: Masked-programmed ROM is echt read-only geheugen. Het krijgt zijn inhoud tijdens de fabricage en deze inhoud kan nadien niet meer veranderd worden door een gebruiker.
+
+PROM:: Programmable ROM is eigenlijk ook read-only. De inhoud kan met behulp van een speciaal programmeertoestel eenmaal vastgelegd worden. Nadien kan de inhoud niet meer gewijzigd worden.
+
+EEPROM:: (_Electrically Erasable PROM_). Ook met dit type geheugen kan de inhoud gewist en vervolgens aangepast worden. Het verschil met EPROM is dat nu geen UV-licht nodig is, maar dat elektrische signalen volstaan voor het wissen. Dit kan dus met hetzelfde toestel als waarmee geprogrammeerd wordt. Het nadeel van EEPROM is de kostprijs. Voor dezelfde densiteit is het een pak duurder dan EPROM.
+
+Flash:: is net zoals EEPROM te wissen en opnieuw te beschrijven met elektrische signalen. Bovendien is voor flash geen speciaal programmeertoestel nodig. Aan de andere kant haalt het met EPROM vergelijkbare densiteiten. Bovendien is geen speciale verpakking met glas nodig. +
+Het nadeel van flash is dat het minder dikwijls herschreven kon worden dan EEPROM. Voor toepassingen waar regelmatig de data moet worden aangepast, bestaat ondertussen high-endurance flash. Gewoon flash geheugen kan tussen 300.000 en 500.000 keer herschreven worden. De high-endurance variant een paar miljoen keer. Extra probleem hierbij is dat geen individuele cellen aangepast kunnen worden, maar dat steeds ganse blokken in een keer geschreven moeten worden. Hierdoor kan deze beperking nog zwaarder doorwegen (cel wordt meer beschreven dan dat ze wordt veranderd). 
+
+
+De BIOS routines worden nu meestal opgeslagen op flash geheugens, wat toelaat om de routines te upgraden. Bij dergelijke upgrades is het natuurlijk cruciaal dat er niets mis gaat, want dan zal de computer niet meer in staat zijn om op te starten. Sommige moederbord fabrikanten voorzien in een procedure om terug te keren naar een vorige versie wanneer een flash operatie mislukt. Als een dergelijke procedure niet voorhanden is, kan je enkel nog hopen dat de flash-IC niet vast gesoldeerd is, zodat je hem met een andere programmer kan programmeren.
+
+===	Opstartroutine met BIOS
+Bij het aanschakelen van de spanning wordt een reeks stappen doorlopen. De volgorde is afhankelijk van de fabrikant van de hardware (de hoofdkaart, BIOS, CMOS en andere componenten). Onderstaande stappen worden steeds uitgevoerd.
+
+====	Systeemstart
+Eerst start de interne voeding op. Het duurt even voor alle lijnen een stabiele spanning afgeven. Eens dit het geval is geeft de voeding een power good-signaal. De chipset, die gevoed werd door de 5V standby lijn, zal het reset-signaal pas wegnemen op het ogenblik dat het power good signaal komt. Zodra het reset signaal wegvalt, zal de computer beginnen opstarten. De processor begint op adres FFFFOh, waar de uitvoering van de BIOS opstartroutine begint.
+
+====	Power On Self Test (POST)
+De opstartroutine uit de BIOS voert de Power-on-self-test (POST) uit. Indien er fatale fouten ontdekt worden, geeft het een foutmelding, indien om de een of andere reden de grafische kaart niet bruikbaar is enkele BEEP-signalen, en stopt het startproces. Dit kan bijvoorbeeld het geval zijn indien er een probleem met de grafische kaart ontdekt wordt (de kaart is defect of is niet goed ingeplugd) of wanneer de kabel voor de harde schijf verkeerd aangesloten werd.
+
+====	Zoeken naar BIOS-uitbreidingen
+De systeem-BIOS is niet het enige BIOS in een computer. Grafische kaarten, harde schijven, storage-adapters en andere hebben ook hun eigen BIOS. Het systeem-BIOS gaat daarom onmiddellijk op zoek naar de grafische kaart en laat het ingebouwde video-BIOS programma uitvoeren. Hierdoor verschijnt er informatie over de kaart op het scherm. Deze informatie is doorgaans slechts heel even op het scherm.
+
+Daarna voert de computer enkele tests uit op het systeem (vervolg POST): onder andere het geheugen wordt onderzocht en de geheugenplaatsen geteld. Het BIOS zal bij een defect een foutmelding geven. +
+
+Vervolgens begint het de startroutine aan een inventarisatie waarbij de meeste klassieke randapparatuur (printerpoorten, seriële poorten, floppy- en harddisk controllers) gedetecteerd zal worden. +
+
+
+Een recente BIOS zal zelfs automatisch het soort geheugen herkennen en de juiste parameters voor de harde schijf instellen. +
+Meestal wordt op het scherm getoond welke apparaten, harde schijf, DVD-ROM, … gevonden en herkend worden.
+
+.Oefening
+-------
+Zoek voor het moederbord van jouw pc op welke auditieve foutcodes van toepassing zijn.
+-------
+
+===	Plug and play configuratie
+
+Indien een plug and play ondersteunend bussysteem (zoals PCI) aanwezig is, zal een plug and play configuratie fase doorlopen worden: Er wordt gezocht naar P&P-devices op alle aanwezige I/O bussen (PCI, PCI Xpress, AGP). Dit wordt de enumeration genoemd. Voor elk gevonden device wordt gelezen welke resources (I/O-adressen, Interrupts, DMA-kanalen, geheugenruimte) er nodig zijn. De lijst met de vorige configuratie (inclusief de vroegere toekenning van de resources) wordt uit het ESCD geladen en vergeleken met de nieuwe informatie. Het ESCD (Extended System Configuration Data) is een deel van het CMOS-RAM geheugen. Hierin wordt de P&P-configuratie opgeslagen. 
+
+Bij het opstarten controleert het BIOS deze gegevens op wijzigingen sinds de laatste start om te weten of bepaalde instellingen moeten aangepast worden. Indien er geen verandering is, gaat het opstartproces gewoon verder. +
+In het andere geval begint er een herconfiguratie. 
+
+De BIOS-setup informatie wordt geraadpleegd voor eventuele gereserveerde systeembronnen door niet Plug and Play-kaarten. Overblijvende systeembronnen worden toegekend aan de PnP-kaarten. Het ESCD wordt bijgewerkt met de mededeling “Updating ESCD... successfull”.
+
+Het bootproces gaat verder. Wanneer het besturingssysteem opgestart is, heeft dat tenslotte nog de mogelijkheid om de Plug and Play-configuratie te controleren en eventueel te wijzigen.
+
+===	Extensible Firmware Interface
+====	BIOS op pensioen
+
+Het systeem van de BIOS is één van de laatste onderdelen die nog niet substantieel veranderd zijn sinds de introductie van de PC lang geleden. Hoewel er geprobeerd wordt om de technische details wat weg te stoppen voor de eindgebruiker, is het toch nog steeds een erg gebruiksonvriendelijke omgeving. Het gebrek aan ondersteuning van bijvoorbeeld muizen is daar een goed voorbeeld van. +
+Aan de binnenkant van het BIOS-raderwerk was de situatie zo mogelijk nog een pak erger. Het programmeren ervan gebeurde voor een stuk in machinecode, en het toevoegen van functionaliteit was grotendeels patchwork. Slechts erg weinig mensen hebben de nodige ervaring om hieraan te programmeren. Sommige zaken zijn zelfs niet op te lossen. Een voorbeeld hiervan is de maximum grootte van de opstartpartitie, die is 2TB. Over enkele jaren zal dat ongetwijfeld te weinig zijn. +
+Daarom zijn er in de loop der tijd enkele pogingen geweest om dit systeem te vervangen. Weinigen daarvan hadden veel succes. Veel had te maken met de licentie waaronder moest gecodeerd worden. Bedrijven waren immers niet bereid om de code van hun drivers vrij te geven. +
+Ook Intel deed een poging om de BIOS overbodig te maken door een ander systeem. Om het project voldoende momentum te bezorgen, werd een organisatie opgebouwd rond deze technologie, met als doel ze te standaardiseren. Deze technologieën zijn verzameld in de EFI (Extensible Firmware Interface).
+
+Deze technologie verschilt fundamenteel van de verouderde BIOS.
+
+*	Gecodeerd in een breed gekende taal (C++)
+*	Volledig modulair
+*	Compatibel met de oude BIOS om de overgang mogelijk te maken.
+*	Drivers kunnen opgenomen worden in deze EFI
+*	De 2TB-grens voor de opstartpartitie is hier niet bestaande
+
+Door dit vernieuwde opzet zullen ongetwijfeld een pak nieuwe mogelijkheden toegevoegd worden aan de PC zoals we hem nu kennen. EFI laat zich nog het best vergelijken met een micro-besturingssysteem. 
+Enkele voorbeelden van nieuwe toepassingen:
+
+*	Omdat drivers kunnen geïntegreerd worden, kan het veel makkelijker worden om een nieuw besturingssysteem te installeren. Rondzeulen met driverdisks voor eenvoudige devices zou dus moeten verleden tijd worden. 
+*	EFI kan makkelijk uitgebreid worden met kleine toepassingen. Denk bijvoorbeeld aan een mediaplayer. Zo zou je kunnen je laptop gebruiken als mediaspeler, zelfs zonder dat die ‘echt’ opgestart is.
+*	EFI zou kunnen voorzien worden van een virtualisatielaag zodat je meerdere besturingssystemen tegelijkertijd kan gebruiken.
+*	Hoewel de mogelijkheden nagenoeg eindeloos zijn, is te verwachten dat de eerste gebruikte EFI’s niet veel meer functionaliteit hebben dan de vroegere BIOS’en.
+
+
+image::ch05/images/UEFI_01.jpg[alt="UEFI interface (voorbeeld)",width="500",scaledwidth="500",align="center"] 
+
+
+====	(U)EFI verspreiding
+Aan EFI wordt sedert 2002 gewerkt door enkele grote firma’s. Nagenoeg elke grote hardware bouwer heeft zich bij de organisatie aangesloten. Toch zal het nog een tijd duren vooraleer we het BIOS volledig kunnen naar de geschiedenis verwijzen. Een overzichtje van de ondersteuning tegenwoordig:
+
+*	Apple: standaard op alle recente computers (met BIOS-support)
+*	Microsoft: standaard vanaf vista X64 sp1
+*	Linux: reeds lange tijd standaard geïmplementeerd
+
+Ook moederborden bieden tegenwoordig meestal ondersteuning, al zullen ze vaak nog manueel moeten ingesteld worden om UEFI te selecteren, BIOS blijft voorlopig nog even default.
+ 
+=== Coreboot
+
+Een tweede alternatief voor BIOS is Coreboot. Dit project is conceptueel verschillend van UEFI omdat coreboot zichzelf probeert overbodig te maken. Zo snel mogelijk na het opstarten wordt de controle doorgegeven aan het besturingssysteem. 
+Coreboot zal de meest elementaire hardware initialiseren (vb RAM-geheugen) Het besturingssysteem krijgt dan alle verdere controle. Coreboot bevat zelfs geen GUI.
+De coreboot-code is daardoor erg compact en snel. 
+
+Besturingssystemen die niet rechtstreeks kunnen booten via coreboot, kunnen gebruik maken van een alternatieve 'payload' die compatibiliteit met BIOS garandeert.
+
+Deze technologie is momenteel (nog?) niet breed ondersteund, maar is bijvoorbeeld wel bij chromebooks in gebruik.

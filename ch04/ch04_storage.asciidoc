@@ -1,0 +1,735 @@
+== Opslagmedia
+
+In dit hoofdstuk duiken we onder de motorkap van het secundair geheugen. Heel vaak wordt dit geïmplementeerd met HDD's of SSD's. Naast de fysieke eigenschappen bespreken we ook de logica die softwarematig een managementlaag (=bestandssysteem) voorziet voor gebruik door het besturingssysteem.
+
+===	Harde schijf
+==== Fysieke opbouw
+ 
+.Fysieke opbouw harde schijf
+image::ch04/images/harddiskfysiekeopbouw.png[alt="hdd fysieke opbouw", align="center", scaledwidth="50"] 
+
+Bovenstaande afbeelding toont de fysieke opbouw van een harde schijf. + 
+Een harde schijf bestaat uit een aantal aluminium schijven, die men *platters* noemt. De keuze voor aluminium is ingegeven door de mechanische eigenschappen van dit materiaal. Aluminium is licht en toch voldoende stijf. Belangrijk nadeel van aluminium is dat het een niet magnetisch materiaal is, zodat het niet bruikbaar is voor magnetische opslag. 
+
+Dit probleem wordt verholpen door de platter te voorzien van een dun laagje magnetisch materiaal. Uiteraard kan een dergelijk laagje langs beide kanten van de platter voorzien worden. +
+Vlak boven (en meestal ook onder) het schijfoppervlak zweeft een schijfkop (head). 
+
+Voor een goed functionerende schijf is het dus belangrijk dat de lucht rond de platters zuiver is. Daarom worden schijven bij de productie luchtdicht verpakt. De platters zitten allemaal op eenzelfde as, die door een motor aan hoge snelheid wordt rondgedraaid. +
+Op die manier beweegt de *schijfkop* over het oppervlak.
+
+Wanneer door de kop een positieve stroom loopt, worden de magnetische deeltjes op de schijf in een bepaalde zin georiënteerd. Wanneer een negatieve stroom door de kop gestuurd wordt, zullen de deeltjes in tegengestelde zin gericht worden. 
+
+Omgekeerd, als een *kop*, waarin geen stroom gestuurd wordt, over het schijfoppervlak beweegt, dan zal in de kop een positieve of negatieve stroom geïnduceerd worden naargelang de oriëntatie van de deeltjes op het schijfoppervlak.Wanneer de kop stil wordt gehouden, passeren een opeenvolgende reeks bits op de schijf die men een track of spoor noemt. 
+
+De verschillende sporen vormen concentrische cirkels op de schijf. Alle sporen met dezelfde straal, die op de verschillende platters liggen, vormen samen een *cilinder*.
+
+.logische indeling van een schijf (bron: technet.microsoft.com)
+image::ch04/images/logischeopbouw.jpg[alt="", align="center", scaledwidth="50", width="450"] 
+
+Door het ronddraaien van de schijf bewegen de koppen over een cilinder. De verplaatsing naar een andere cilinder gebeurt door een axiale verplaatsing van de arm, waarop alle koppen bevestigd zijn.
+
+===== Sectoren, tracks, ...
+
+De kleinste hoeveelheid data, die een kop in een keer kan verwerken is een sector. Een sector vormt een onderverdeling van een spoor en kan dus gelezen worden zonder de kop te verplaatsen. 
+
+ 
+.Onderverdeling van tracks in sectors en bits
+image::ch04/images/sector.png[alt="", align="center", scaledwidth="50"] 
+
+Bovenstaande afbeelding toont de onderverdeling van tracks in sectors en sectors in bits. Een track is opgebouwd uit een aantal sectoren met tussen de sectoren een tussenruimte. +
+De sectoren zelf beginnen met een preamble. Dit is een vastgelegd patroon waaraan de schijfcontroller de start van een sector kan herkennen.
+
+Vervolgens volgen een aantal databits. Dit aantal kan variëren, maar zal bijna altijd gelijk zijn aan 4096 of 512 bytes. Bij recente schijven wordt steevast een sector size verkozen van 4096 bytes. (dit wordt Advanced Format genoemd) Door een verminderde overhead kan zo ongeveer 13% meer nuttige ruimte op een harde schijf ontstaan. <<MANGAN>> +
+Na de databits volgt een foutcorrigerende code (ECC - Error Correcting Code). Deze laat toe om fouten in de databits te herstellen. Meestal is dit een Reed-Solomon code. Ook deze eigenschappen werden verbeterd door het 4k advanced format van sectoren.
+
+De verdeling van de schijf in sectoren en tussenruimte en van de sectoren in preamble, data en ECC gebeurt tijdens het formatteren. Bij het formatteren gaat er dus een stuk schijfruimte verloren aan tussenruimte, preambles en ECC-bits. Hierdoor kan de capaciteit afnemen met 15% ten opzichte van de ongeformatteerde capaciteit. Hier moet je op letten als je verschillende schijven met elkaar vergelijkt. Sommige fabrikanten geven de ongeformatteerde grootte op. 
+
+In de afbeelding zijn ook maten opgegeven voor de breedte van een spoor en de breedte van een bit in een spoor. Hoewel deze maten ondertussen al achterhaald zullen zijn, geven ze wel aan dat de bitdichtheid op een spoor groter is dan de bitdichtheid in radiale richting. 
+
+De bitdichtheid is uiteraard een belangrijke parameter, waar hard aan gewerkt wordt om deze zo groot mogelijk te maken. Een grotere bitdichtheid maakt immers schijven met grotere capaciteit mogelijk of maakt het mogelijk om kleinere platters te maken met behoud van de capaciteit. +
+Ondertussen botst men in het streven naar steeds grotere dichtheden op fysische limieten. Wanneer een magnetisch materiaal gemagnetiseerd wordt, worden dipool moleculen in een bepaalde richting georiënteerd. Het is niet mogelijk om de moleculen individueel te gaan draaien, het gaat steeds om een groep van moleculen die samen gericht worden. De kleinste dergelijke groep heet een magnetisch domein. +
+Omdat men met de dichtheden die op een spoor zitten stilaan in de buurt komt van het oriënteren van een domein en dus niet kleiner meer kan gaan in die richting, is er ondertussen een nieuwe techniek ontstaan. Deze nieuwe techniek gaat geen gebieden in de tangentiële richting gaan magnetiseren, maar gaat werken in de diepte. +
+Dit heet perpendicular recording (loodrechte opname).
+ 
+.Perpendicular recording (bron: Wikipedia)
+image::ch04/images/2000px-Perpendicular_Recording_Diagram.svg.png[alt="", align="center", scaledwidth="50", width="600"] 
+
+
+===== Toegangstijd
+De snelheid van schijven hangt van diverse factoren af. Een eerste stap is dat de schijfkop boven het juiste spoor gebracht moet worden, de kop moet in radiale richting gepositioneerd worden. +
+Deze actie noemt men een seek. De seek time is dus een belangrijke parameter bij een harde schijf. Dikwijls worden twee verschillende seek times opgegeven: een track-to-track seek time en een average seek time. De eerste is de tijd nodig om de kop te bewegen tussen twee aan elkaar grenzende sporen, de tweede is de gemiddelde tijd die nodig is om de kop te verplaatsen naar een willekeurig ander spoor. Uiteraard is de eerste tijd een stuk korter dan de tweede tijd (mogelijk reeds achterhaalde richtwaarden: 1ms voor track-to-track, 10ms voor average seek time).
+
+Eens de kop boven het juiste spoor zweeft, is er nog een rotatiewachttijd nodig alvorens de kop boven de gewenste locatie komt. Deze rotatie wachttijd is vooral afhankelijk van de rotatiesnelheid. Gangbare snelheden zijn 5400, 7200, 10000 of 15000 toeren per minuut. De gemiddelde wachttijd (average latency) is de tijd die nodig is om de schijf een halve rotatie te laten uitvoeren. Bij de vermeldde snelheden is dit 5,56ms, 4,16ms en 3ms. Tenslotte is er nog de tijd nodig om de gegevens effectief te verwerken. +
+Een moderne schijf haalt gemiddelde overdrachtssnelheden van ongeveer 60MB/s (opgelet: niet vergelijken met de maximale overdrachtssnelheid die fabrikanten opgeven). +
+Bij deze snelheid duurt het 8,5ms om een sector van 512 bytes te verplaatsen. Het zal dus duidelijk zijn dat de seek time en de average latency duidelijk domineren ten opzichte van de eigenlijke overdrachtstijd. Het komt er dus ook op aan om te vermijden dat willekeurige sectoren over de schijf gelezen moeten worden. 
+
+===== Invloed van fysieke geometrie op de performantie
+
+Eerder werd al de fysieke opbouw van de harde schijf besproken. Deze fysieke geometrie bepaalt mee de snelheid die gehaald kan worden. +
+Helaas zijn sommige eigenschappen tegenstrijdig met andere kwaliteiten die nagestreeft  worden, waaronder ook het goedkoop kunnen aanbieden van de schijven. Een eerste duidelijk voorbeeld is de rotatiesnelheid van de harde schijf. Hoe sneller de schijf rond draait, hoe kleiner de average latency kan zijn. Daar staat tegenover dat een sneller draaiende schijf meer energie vraagt, wat een ongewenste eigenschap is in het geval van batterijgevoede apparaten zoals laptops. Een tweede voorbeeld is het aantal platters. Meer platters betekent dat er meer gegevens beschikbaar zijn, zonder dat de leeskoppen radiaal verplaatst moeten worden. Daar staat dan weer tegenover dat de motoren krachtiger moeten zijn (grotere massa roteren of verplaatsen), met een groter verbruik tot gevolg. Door de grotere massa zullen de schijven ook trager op gang komen, waardoor het minder interessant wordt om ze uit te schakelen (wat het verbruik uiteraard nog meer negatief beïnvloed). + 
+Bovendien geven extra platters aanleiding tot grotere trillingen en dus meer lawaai. Tenslotte moeten de platters natuurlijk fysiek in de behuizing van de schijf passen. Een laatste voorbeeld is de capaciteit van de schijf. Als de capaciteit van de schijf vergroot, terwijl alle andere parameters (aantal platters, grootte van platters) dezelfde blijven, dan vergroot de bitdichtheid. Een grotere bitdichtheid betekent dat bij dezelfde rotatiesnelheid bits sneller onder de kop passeren en dus sneller gelezen of geschreven kunnen worden.
+
+Omwille van de eenvoud van de omrekening werden eerst over de gehele schijf hetzelfde aantal sectoren per cilinder gebruikt. Cilinders die aan de buitenkant van de schijf lagen, hebben een grotere omtrek. Als op een grotere omtrek eenzelfde aantal sectoren ligt met eenzelfde aantal bits per sector, dan betekent dit dat de bitdichtheid aan de buitenkant kleiner is dan aan de binnenkant en dus ook kleiner dan wat technologisch haalbaar is. Op deze manier worden dus zowel snelheid als capaciteit beperkt, voldoende redenen om de schijf ook nog eens te verdelen in zones.
+ 
+.HDD opdeling in zones
+image::ch04/images/zones.png[alt="", align="center", scaledwidth="50"]
+
+Cilinders die binnen eenzelfde zone liggen hebben hetzelfde aantal sectoren per cilinder. In de figuur is te zien dat het aantal sectoren toeneemt naar de buitenkant van de schijf toe.
+
+.voorbeeld
+==== 
+Je koopt jezelf een SATA harde schijf, waarvan enkele specificaties gekend zijn. 
+256 bytes/sector
+100 sectors per track
+1000 tracks per oppervlak
+3 platters
+gemiddelde zoektijd van 8ms
+rotatiesnelheid is 15000 RPM
+
+Hoe lang duurt het om tien opeenvolgende sectoren te lezen van dezelfde track?
+Hoe lang duurt het om 10 random sectoren te lezen?
+
+====
+
+Op http://en.wikipedia.org/wiki/Hard_disk_drive vind je een aanvullend educatief filmpje over de werking van de harde schijf.
+
+===== Schijfcontroller
+
+Een laatste belangrijk onderdeel van de harde schijf is de schijfcontroller. Deze stuurt enerzijds de motoren en leeskoppen aan, zodat de juiste gegevens bereikt worden, anderzijds verzorgt hij de communicatie met de buitenwereld. 
+
+Zoals al eerder vermeld zal deze controller onder andere een omzetting doen van de LBA adressen die hij binnenkrijgt, naar een fysieke kop, cilinder en sector. 
+
+Samen met deze vertaling houdt de controller ook een mapping bij van slechte sectoren. Sommige sectoren kunnen een permanent gemagnetiseerde plek vertonen, waardoor ze onbruikbaar worden voor het opslaan van variabele informatie. Op elk spoor worden een aantal reserve sectoren voorzien, die de plaats kunnen innemen van een van de defecte sectoren. 
+
+Uiteraard moet de controller dan zijn mapping van logische naar fysieke adressering aanpassen. Controllers kunnen ook sectoren bufferen in een cache, zodat operaties naar de schijf sneller kunnen verlopen.
+
+==== Adressering
+
+Origineel gebruikte men voor harde schijven een bijzonder logische Cylinder Head Sector (CHS)-adressering. Elke willekeurige sector wordt uniek gekenmerkt door een (kant van een) platter te kiezen (head), op die platter een cilinder (radiale positie kop boven schijf) en een sector op het geselecteerde spoor (tangentiële positie kop boven schijf).
+
+De oorspronkelijke CHS adressering gebruikte tien bits voor de cilinder, vier bits voor de kop en 6 bits voor de sector. Merk op hoe opeenvolgende adressen zich eerst op hetzelfde spoor bevinden, vervolgens op verschillende platters en tenslotte pas de cilinder wijzigt. Zolang bestanden dus op opeenvolgende locaties staan, kunnen ze met minimale verplaatsingen (en dus minimale seek en latency times) verwerkt worden. De originele adressering had twee belangrijke nadelen. 
+
+Een eerste belangrijk nadeel is dat er slechts twintig bits beschikbaar zijn voor het adres van een sector. 
+Bovendien startte de nummering van de eerste sector (vermoedelijk door een fout in de (in assembler geschreven) BIOS routines) bij 1 inplaats van 0. Daardoor waren er 1024 cilinders, 16 koppen en 63 sectoren mogelijk. 
+
+Met een sectorgrootte van 512 bytes betekent dit dat maximaal 512*1024*16*63 = 504MB op de schijf kunnen worden aangesproken. Een dergelijke schijf leek op dat ogenblik waarschijnlijk gigantisch, maar is op dit ogenblik belachelijk klein.
+
+Tweede nadeel is dat de adressering direct gelinkt is aan de geometrie van de harde schijf. Een schijf met bijvoorbeeld 2048 cilinders, 8 koppen en 63 sectoren, had de maximale grootte van 504MB, maar kon niet volledig geadresseerd worden. De schijf zou slechts 252MB groot lijken.
+
+Om het tweede probleem te omzeilen begonnen schijfcontrollers te liegen. Ze maakten de computer wijs dat ze een andere geometrie hadden dan de werkelijke fysieke opbouw en vertaalden het CHS-adres naar een fysiek adres op de schijf. De oplossing voor de capaciteit van de schijf kan enkel zijn dat er meer bits werden voorzien om de sectoren te adresseren. Een eerste uitbreiding gebruikte 10 bits voor de cilinder, 8 voor de kop en 6 voor de sector. Wat een capaciteit gaf van 8GB. Bij verdere uitbreiding van dit aantal bits koos men meteen ook voor een ander soort adressering, die niet rechtstreeks aan de geometrie van de harde schijf gelinkt was. Deze vorm van adressering werd dan Logical Block Addressing (LBA). Hierbij krijgt elke sector gewoon een volgnummer, dat dan op de schijf zelf omgezet werd naar een fysiek CHS-adres. Dit laatste CHS adres wordt enkel op de schijf zelf gebruikt en kan dus volledig aan de fysieke geometrie van de schijf worden aangepast.
+
+Bij de eerste versie van LBA werden 28 bits voorzien voor het adresseren van een sector. Dit geeft een maximale grootte van 512 * 2^28^ = 128GB. 
+
+Ondertussen blijkt ook dit ontoereikend en is er al een nieuwe adressering die 48 bits gebruikt en dus 128PB (petabyte) toelaat. Hiervan wordt vermoed dat dit voldoende zal zijn tot 2035. De gebruikte adressering is belangrijk omdat ze ervoor kan zorgen dat niet de volledige capaciteit van de harde schijf beschikbaar is. 
+In het bijzonder kan dit een probleem zijn indien de BIOS nog een oudere vorm van adressering gebruikt. De bios moet immers bij het opstarten van de computer de schijf aanspreken om het besturingssysteem te laden. Dan moeten de relevante gegevens zich wel bevinden binnen de beperkingen van de adressering van de BIOS. Eens het besturingssystemen is opgestart, neemt dit de taken van de bios over en bepalen de mogelijkheden van het besturingssysteem in hoeverre de schijf volledig aangesproken kan worden.
+
+
+
+==== Scheduling
+
+Gezien de werking van een schijf zal de tijd nodig om een bepaalde sector te lezen bestaan uit drie componenten:
+
+. de tijd nodig om de kop boven een bepaald spoor te positioneren (seek time)
+. de tijd totdat de gewenste sector zich onder de kop bevindt (latency time)
+. de tijd nodig om de gegevens fysiek te transfereren (transfer time)
+
+Om de totale verloren tijd zoveel mogelijk te beperken zal men de sectoren meestal niet één per één van de schijf lezen, maar in blokken of clusters. Een dergelijk blok zal minstens één sector moeten bevatten. Vaak zal een blok 4 tot 8 kB zijn terwijl een sector typisch 512 bytes is. Hoe groter de blokken, des te efficiënter de gegevensoverdracht, maar ook des te groter de interne fragmentatie gezien een blok de kleinste hoeveelheid schijfruimte is die gealloceerd kan worden. De blokgrootte kan bij de generatie van het bestandensysteem gekozen worden en zal afhangen van de kenmerken van de bestanden op de schijf. Indien men louter met zeer grote bestanden werkt, kan men de voorkeur geven aan vrij grote blokken. +
+Voortaan zullen we ervan uitgaan dat alle interactie met de harde schijf in blokken gebeurt.
+
+Indien er verschillende schijfoperaties staan te wachten op de schijf kunnen we, door de volgorde ervan te veranderen de prestaties van de schijf verbeteren. Deze strategie zal enkel een verschil opleveren op het ogenblik dat de schijf effectief zwaar belast wordt (en er dus keuze is).
+
+Schijfstrategieën kunnen door het besturingssysteem geïmplementeerd worden (rekening houdend met de kenmerken van het besturingssysteem), of (meer en meer) ook door de schijfregelaar (rekening houdend met de kenmerken van de schijf). 
+Wanneer het in de harde schijf zelf gebeurt wordt het ook wel NCQ genoemd (Native Command Queuing). Indien NCQ niet ondersteund wordt door de schijf dan zorgt enkel het besturingssysteem voor de scheduling, indien wel is het een combinatie van beide wat voor minder processorbelasting zorgt in de computer.
+
+In de nu volgende bespreking wordt verondersteld dat de volgorde van sporen waarnaar gelezen of geschreven moet worden is: *98, 183, 37, 122, 14, 124, 65, 67* en dat de kop initieel op positie *53* staat.
+
+===== FCFS: First-Come First-Serve
+Deze strategie is de eenvoudigste, en bovendien is ze eerlijk omdat schijfoperaties niet oneindig lang kunnen uitgesteld worden. Ze kan echter niet de beste prestatie van de schijf garanderen omdat opeenvolgende schijfoperaties kunnen plaatsvinden op totaal verschillende delen van de schijf waardoor er dus veel tijd verloren gaat aan het zoeken van de sporen.
+
+
+.First-Come First-Served Disk Scheduling
+image::ch04/images/scheduling/fcfs.jpg[width="400",scaledwidth="50",alt="fcfs",align="center"]
+
+==== SSTF: Shortest Seek Time First
+Om te vermijden dat de lees/schrijfkop zich wild heen en weer gaat bewegen over de harde schijf indien FCFS gebruikt wordt kan men de voorkeur geven aan die schijfoperaties die in de onmiddellijke nabijheid van de huidige koppositie moeten doorgevoerd worden. Het voordeel van deze strategie is dat de zoektijden hierdoor zullen afnemen, maar anderzijds is deze strategie niet langer gegarandeerd eerlijk, omdat bij een zware belasting er blijvend aanvragen kunnen binnenkomen voor een bepaald deel van de schijf waardoor verder afgelegen delen van de schijf niet bediend worden. In tegenstelling met SJF is SSTF geen optimaal algoritme. In de afbeelding zou het bijvoorbeeld efficiënter zijn om eerst naar cilinder 37 te gaan en dan pas SSTF toe te passen.
+
+
+.Shortest Seek Time First Disk Scheduling
+image::ch04/images/scheduling/sstf.jpg[width="400",scaledwidth="50",alt="sstf",align="center"]
+
+===== SCAN: Scannen
+Dit algoritme tracht de voordelen van SSTF te combineren met een eerlijk gedrag. Het overloopt de schijf van het eerste tot het laatste spoor en omgekeerd hierbij alle operaties uitvoerend `en passant'. Dit garandeert dat alle schijfoperaties finaal zullen uitgevoerd geraken en is te vergelijken met een bus die op zijn heen- en terugweg bij alle haltes stopt waar personen staan te wachten.
+
+.Scan Disk Scheduling
+image::ch04/images/scheduling/scan.jpg[width="400",scaledwidth="50",alt="scan",align="center"]
+
+
+===== C-SCAN: Cirkulair Scannen
+Dit is een verbetering van de SCAN strategie. Op zijn terugweg zal de kop in het begin nauwelijks of geen operaties ontmoeten (deze sporen werden immers pas net bediend). Indien er dan toch al operaties zijn, zullen ze alle zeer recent zijn. De operaties aan de overzijde van de schijf staan echter reeds geruime tijd te wachten. Daarom zal C-SCAN op zijn terugweg geen sporen bedienen maar meteen bij spoor 0 herbeginnen (zie figuur). Hier zullen de gemiddeld oudere aanvragen eerst bediend worden. Dit algoritme is in zekere zin eerlijker dan SCAN, maar geeft wel een slechtere doorvoercapaciteit omdat de terugweg onderbenut wordt. Deze strategie zal zich bijzonder slecht gedragen indien de sporen sequentieel van rechts naar links moeten gelezen worden.
+
+.Circular Scan Disk Scheduling
+image::ch04/images/scheduling/cscan.jpg[width="400",scaledwidth="50",alt="cscan",align="center"]
+
+===== LOOK + C-LOOK: Aangepaste SCAN + C-SCAN
+In de praktijk zal men de kop van de schijf niet tussen de twee uiterste uiteinden van de schijf laten bewegen, maar wel tussen die twee uiterste sporen waarvoor er aanvragen zijn (vergelijkbaar met een lift)
+
+
+.Look Disk Scheduling
+image::ch04/images/scheduling/look.jpg[width="400",scaledwidth="50",alt="look",align="center"]
+
+.Cirkular Look Disk Scheduling
+image::ch04/images/scheduling/clook.png[width="400",scaledwidth="50",alt="clook",align="center"]
+
+
+
+
+===	Solid state drive
+ 
+.SSD drive zonder behuizing
+image::ch04/images/zones.png[alt="", align="center", scaledwidth="50"]
+
+In plaats van een magnetische schijf wordt in een SSD gebruik gemaakt van DRAM of flash geheugen om de gegevens op te slaan. DRAM heeft uiteraard als nadeel dat met het wegvallen van de stroom ook de gegevens verdwijnen. +
+Daarom worden dergelijke ‘schijven’ uitgerust met een batterij, die toelaat om de gegevens nog naar een backup schijf te schrijven. Dergelijke schijven zijn geschikt om dienst te doen als opslagmedium voor de swap. Hoewel er nog een beperking is van de interface waarmee de SSD verbonden is met het systeem, zal dit sneller zijn dan een magnetische schijf. Daar staat tegenover dat DRAM duur is en dat het logischer is om het gewoon rechtstreeks in de geheugenbanken te voorzien. +
+Deze oplossing is dus vooral interessant als het fysieke geheugen niet uitgebreid kan worden (bijvoorbeeld maximum 4GB met 32-bit processor). +
+Veel fabrikanten werken aan drives met flash geheugen. Deze technologie is een stuk goedkoper en verliest zijn inhoud niet bij het wegvallen van de stroom. Hoewel flash nog steeds een stuk duurder is dan magnetische opslag, lijkt deze technologie toch een alternatief te kunnen vormen voor magnetische harde schijven. +
+Recente productlanceringen lijken erop te wijzen dat deze technologie heel snel matuur wordt. +
+In 2014 lijkt de SSD-prijs te stabiliseren rond 0.8USD/GB <<PCPART>>, en de trend is nog steeds dalend. 
+
+De meeste voordelen volgen uit het ontbreken van mechanische onderdelen: 
+
+* De schijf moet niet draaien en moet dus ook niet opstarten, geen kop die bewogen moet worden, dus willekeurige toegang kan sneller.
+* Fragmentatie van bestanden wordt minder belangrijk 
+* Geen bewegende onderdelen, dus geen lawaai 
+* Stroomverbruik ligt lager dan bij conventionele schijven
+* Beter bestand tegen schokken, temperatuur, hoge hoogte tenzij voor high-end schijven, ligt het verbruik lager
+
+Uiteraard zijn er ook nadelen. Zoals al vermeld is er voorlopig nog de kostprijs. Daarnaast is er ook de specifieke eigenschap van flash dat het slechts een beperkt aantal keer beschrijfbaar is. +
+Door recente ontwikkelingen valt dit nadeel echter bijna volledig weg. Tegenwoordig zijn cellen in SSD-schijven meer dan 1 000 000 keer herschrijfbaar, en dat zou voldoende moeten zijn om bij normaal gebruik vele jaren correct te functioneren. Behalve bij erg specifieke schrijfintensieve taken (vb logging server) zal deze limiet nooit een probleem vormen. +
+Een belangrijke rol hierbij is weggelegd voor de controller, het intelligente hart van de SSD-schijf. Die zal ervoor zorgen dat elk deel van het geheugen ongeveer evenveel beschreven wordt, zodat de slijtage over het hele geheugenbereik ongeveer gelijk is. +
+Aangezien verspreidde bestanden toch geen invloed hebben op de snelheid, veroorzaakt dit geen performantieverlies. +
+Het gebruik van de erase-blocks maakt ook dat meer gegevens moeten worden aangepast, waardoor echt random schrijven trager wordt (veel meer extra gegevens die moeten worden aangepast). SDD’s zijn eigenlijk al goed ingeburgerd onder de vorm van geheugenkaarten en USB sticks. Stilaan beginnen ook laptops op te duiken die voorzien zijn van een solid state schijf. +
+Ook voor specifieke servertoepassingen wordt de SSD stilaan een interessant alternatief voor ‘gewone schijven’. Denk daarbij maar aan webservers, die heel veel kleine bestanden (webpagina’s) moeten lezen vanop de schijf: die hebben duidelijk baat bij snelle access-tijden.
+
+==== Flash technologie
+Flash geheugen bestaat uit cellen die in staat zijn om een spanningsniveau te onthouden. er onderscheiden zich twee belangrijke types:
+
+===== SLC
+Flash-geheugen bestaat uit cellen die data bevatten. Bij SLC zal elke cel één bit bevatten. Dat is de meest eenvoudige en snelle manier om geheugen te produceren, maar helaas ook de duurste: je hebt immers veel cellen nodig om een grote capaciteit te behalen.
+
+.SLC geheugen
+image::ch04/images/slc.png[alt="", align="center", scaledwidth="50"] 
+
+
+===== MLC
+MLC (multi level cell) houdt in dat iedere cell in het geheugen meerdere bits kan onthouden. Beschouw daarvoor onderstaande figuur:
+ 
+.MLC geheugen
+image::ch04/images/mlc.png[alt="", align="center", scaledwidth="50"] 
+
+Iedere cel zal dus in staat zijn om bijvoorbeeld vier verschillende spanningsniveaus te bewaren. Je ziet dat MLC gevoeliger zal zijn voor fouten: als er een klein beetje van het spanningsniveau is weggelekt zal je de data niet meer juist uitlezen. +
+Vanwege die nood aan precisie zal MLC dus trager gelezen en beschreven kunnen worden. MLC wordt dus voornamelijk gebruikt waar een grote capaciteit belangrijker is dan een erg grote betrouwbaarheid of snelheid.
+
+====	Schrijfcyclus van Flash Memory
+
+Het beschrijven van Flash is in tegenstelling tot lezen (gebeurt in één beweging) een heel karwei. Beschouw onderstaande figuur, waarbij een document moet geschreven worden, gespreid over drie plaatsen in een datablok.
+
+.Schrijfcyclus Flash 
+image::ch04/images/flash_write.png[alt="", align="center", scaledwidth="40"] 
+
+De verschillende stappen die nodig zijn gaan als volgt:
+. De huidige data wordt in de snelle cache ingelezen
+. De cellen die aangeduid staan als waardeloos worden effectief leeggemaakt
+. De huidige data en de te schrijven data worden samengevoegd in de cache
+. De cache wordt terug weggeschreven naar een (leeg!) block in flash.
+
+==== Optimalisatie van Flash
+De SSD-technologie staat nog in zijn kinderschoenen. De recentste types kampen dan ook vaak nog met problemen. Zeker als ze zwaar belast worden vallen ze vaak door de mand. Ook het besturingssysteem vervult hierin een belangrijke rol. Enkele van de problematieken...
+
+=====	Buffering
+Het concept van cache/buffering is jullie uiteraard niet onbekend. Een bijzonderheid van flashgeheugen is dat je voor het schrijven eerst de benodigde blokken moet wissen. Bij reeds gewiste cellen is dit uiteraard niet nodig. Je begrijpt dat deze werkwijze flink wat tijd vraagt. Een cache zal dan ook de schrijfacties bufferen. Als de cache te klein is, zal na een periode van continu schrijven de prestatie sterk degraderen.
+
+=====	Schijfverlamming
+Enkele maanden na het lanceren van SSD’s in 2009 zaten verschillende reviewers met de handen in het haar. Toen ze de schijven reviewden vlak na verschijnen waren die erg snel en enkele maanden later bleek daar amper nog iets van over te blijven. <<ANAND2>>
+
+De verklaring zit in de manier waarop data geschreven wordt naar SSD disks. Uit de uitleg bij ‘cache’ had je al begrepen dat schrijven enkel snel lukt als dat gebeurt naar volledig vrije blokken, anders moeten ze eerst ingelezen/leeggemaakt worden. 
+
+Naarmate de tijd vordert zullen die vrije blokken uiteraard zeldzamer worden.
+De fabrikanten die getroffen werden door dit gênant verschijnsel bakten daarom een nieuwe firmware. Ze bouwden een feature in die soms wel ‘garbage collection’ genoemd wordt. Het concept is dat je schijf probeert op rustige momenten om op schijfniveau  te defragmenteren. informatie in blokken wordt samengevoegd zodat er terug lege blokken bij komen. Die zijn immers veel sneller te beschrijven dan ‘half gevulde’ blokken.
+ 
+.Garbage collection bij Flash Memory
+image::ch04/images/flash_garbage_collection.png[alt="", align="center", scaledwidth="50"]
+
+Een bijkomende manier om hetzelfde probleem te verhelpen is het besturingssysteem laten communiceren met de SSD door middel van het ATA-Trim commando. Het besturingssysteem zal met dit commando aan de schijf vertellen welke data niet meer nodig is. (bijvoorbeeld bestanden die door NTFS als verwijderd staan aangeduid) Dit commando werd geïntroduceerd bij Windows 7 en is ingebakken in Linux kernels vanaf 2.6.28. Zo wordt vermeden dat sectoren verplaatst worden op de SSD, die door NTFS reeds lang als verwijderd werden aangeduid. 
+
+===== Alignment
+Bij SSD’s is het belangrijk dat de grenzen van partities exact overeenkomen met de grenzen van SSD-blocks. Zo komt elke cluster (4k) precies overeen met één block (4k) op de harde schijf. Als er dan data moet geschreven worden in een cluster, dan hoeft maar één block geschreven te worden, en geen twee. Vista en Windows 7 schijnen hier in de setup rekening mee te houden. Van 3rd party tools is dat natuurlijk minder zeker. Je kopieert een gewone schijf dan ook beter niet via sector-based copy tools als Ghost of dd (linux commando)
+
+===	Logische structuur van een opslagmedium 
+
+In het voorgaande werd de harde schijf voornamelijk bekeken vanuit zijn fysieke kenmerken. In wat volgt zullen we de logische indeling van de schijf bekijken.
+We zullen met andere woorden bekijken hoe de schijf toegankelijk is voor bijvoorbeeld het besturingssysteem. Harde schijven worden in de eerste plaats verdeeld in één of meerdere partities (= fysieke formattering), terwijl elke partitie dan georganiseerd wordt volgens de regels van een welbepaald bestandsysteem. (=logische formattering)
+
+Sommige toepassingen die zeer intensief gebruik maken van secundair geheugen (zoals gegevensbanken) vereisen dat een schijf(-partitie) niet logisch geformatteerd wordt. Zij gebruiken de `raw disk' en gebruiken hun eigen logische formattering. Hetzelfde geldt voor de swapruimte op een aantal systemen. De bedoeling is steeds om de overhead van het bestandensysteem te omzeilen.
+
+==== Boot blok
+Bij het opstarten van een computer is het niet duidelijk wat die computer precies zal moeten uitvoeren (Linux, MS-DOS, Windows). De keuze van het besturingssysteem zal onder andere gemaakt worden door de inhoud van de schijf die als `systeemschijf' bekend staat. Het opstarten van een computersysteem staat bekend onder de naam `bootstrappen'. Na het aanleggen van de spanning begint de processor code uit te voeren op een bepaalde vaste plaats in het geheugen. Door op die plaats een ROM-geheugen aan te brengen (geheugen met een voorgedefinieerde vaste inhoud), zal een programma beginnen uitvoeren. Dit (kleine) generische programma gaat na of de hardware van de computer zich gedraagt zoals het hoort, en gaat dan op zoek naar de systeemschijf en tracht daar één of meerdere sectoren te lezen (de zogenaamde boot sectoren). Deze sectoren bevatten de code die nodig is om andere delen van het besturingssysteem in te lezen. Deze code zal op zijn beurt het volledige besturingssysteem inladen, de configuratiebestanden lezen en de controle overleveren aan het besturingssysteem. Het proces van bootstrappen is dus een proces waarbij stap voor stap complexere software van de schijf ingeladen wordt en er gaandeweg meer en meer functies van het besturingssysteem ter beschikking komen.
+
+==== Master Boot Record (MBR) layout
+
+.Inhoud Master Boot Record
+|===
+| offset	|lengte (bytes)	|inhoud
+
+| 0			|446	|MBR programmacode
+| 446 (1BEh)	|16	|eerste partitie-record
+| 462 (1CEh)	|16	|tweede partitie-record
+| 478 (1DEh)	|16	|derde partitie-record
+| 494 (1EEh)	|16	|vierde partitie-record
+| 510 (1FEh)	|2	|55 AA (einde markering)
+|===
+
+Het master boot record is de eerste fysieke sector van de harde schijf. Deze bevat twee gedeeltes: de primaire partitietabel en de MBR-programmacode. +
+De MBR programmacode bevat de nodige instructies om te beslissen van welke primaire partitie opgestart moet worden, om de bootsector van de betreffende partitie in het geheugen te laden en om te starten met het laden van het betreffende besturingssysteem. In de meest eenvoudige vorm zoekt de MBR-code in de partitietabel naar de actieve partitie (zie verder), laadt de bootsector van die partitie in het geheugen en voert de code uit die daarin opgeslagen is. Soms kan de MBR-code ook meer gesofisticeerd zijn en interactie met de gebruiker mogelijk maken. +
+Dit is het geval bij Boot-managers als LILO (Linux Loader), grub en BootMagic. +
+Partitionering is het onderverdelen van de harde schijf in verschillende blokken, met elk een bestandsysteem. Partitioneren kan interessant zijn om bijvoorbeeld verschillende soorten gegevens te groeperen (bijvoorbeeld aparte data partitie, die niet aangepast wordt als het besturingssysteem opnieuw geïnstalleerd wordt). Het kan ook gebruikt worden om bijvoorbeeld een aparte swap-partitie te voorzien of om meerdere besturingssystemen (multi-boot systeem) mogelijk te maken. +
+Bij het partitioneren is het wel belangrijk om op voorhand goed na te denken wat je wil, want achteraf aanpassen van groottes van partities is (afhankelijk van het gebruikte bestandsysteem) niet altijd mogelijk en dikwijls gevaarlijk voor dataverlies. +
+Hoe een schijf is onderverdeeld in partities wordt opgeslagen in een partitietabel. +
+De primaire partitietabel bevat voor elke primaire partitie een record van zestien bytes. De inhoud van zo’n record wordt weergegeven in onderstaande tabel.
+
+.Inhoud partitietabel-record
+|===
+|offset	|lengte (bytes)	|inhoud
+
+| 0	|1	|80h (actieve partitie) of 00h (niet actief)
+| 1	|3	|CHS adres eerste sector van de partitie
+| 4	|1	|type partitie
+| 5	|3	|CHS adres laatste sector van partitie
+| 8	|4	|LBA adres eerste sector
+| 12|4	|aantal sectoren in partitietabel
+|===
+
+Het eerste byte duidt aan of de partitie actief is of niet. Dit kan belangrijk zijn, in het bijzonder in het geval waarbij de MBR op zoek gaat naar de actieve partitie om te booten. Daarnaast zijn er een aantal parameters die de locatie en grootte van de partitie vastleggen en er is een byte dat het type vastlegt. Met dit byte kan aangegeven worden welk bestandsysteem op de partitie staat (b.v. FAT16, FAT32, EXFAT, NTFS, EXT4, ZFS, ...). 
+
+Aangezien er slechts vier records zijn in de primaire partitietabel, kunnen slechts vier primaire partities gedefinieerd worden. Indien meer partities nodig zijn, moet gebruik gemaakt worden van extended of uitgebreide partities. Belangrijke opmerking hierbij is dat niet alle informatie op een extended partitie terecht mag komen. Een belangrijk voorbeeld is een partitie waar Windows op geïnstalleerd wordt. In de primaire partitietabel is er slechts een extended partitie mogelijk. 
+Deze partitie krijgt een type aanduiding die aangeeft dat het gaat om een extended partitie. +
+Op de eerste sector van de extended partitie bevindt zich een extended master boot record (EMBR). In het EMBR is er plaats voor twee partietabel-records. +
+Een van de partities kan weer een uitgebreide partitie zijn. +
+Op die manier kunnen in principe oneindig veel partities aangemaakt worden (al zijn er natuurlijk wel beperkingen, zoals de eindige capaciteit van de schijf). De partities die aangemaakt worden binnen een uitgebreide partitie, noemt men logische partities. 
+ 
+
+.partitiestructuur (bron:Microsoft Technet)
+image::ch04/images/partitionstructure.jpg[alt="partitiestructuur", scaledwidth="50", width="400", align="center" ]
+
+Meestal moet men slechts eenmaal een extended partitie aanmaken en kan men vervolgens in deze partitie logische partities definiëren. Het partitioneringsprogramma maakt automatisch de nodige EMBR’s aan. Bij het aanmaken van een extended partitie moet je goed opletten dat je voldoende ruimte voorziet voor het definiëren van alle logische partities. +
+In onderstaande twee afbeeldingen worden twee voorbeelden gegeven van de indeling van een harde schijf. +
+Het eerste is een eenvoudig voorbeeld met een primaire en een logische DOS-partitie (Microsoft laat slechts een FAT per partitietabel toe). Het tweede voorbeeld toont een complexer voorbeeld met meerdere logische partities. Nu is te zien dat elke extended partitie een EMBR bevat waarin informatie zit voor een logische partitie en een verwijzing naar de volgende extended partitie.
+ 
+.Voorbeeld partitietabel met uitgebreide partitie
+image::ch04/images/partitie1.png[alt="partitiestructuur met uitgebreide partitie", scaledwidth="50", width="400", align="center" ]
+ 
+.Partitietabel met meerdere logische partities
+image::ch04/images/partitie2.png[alt="partitiestructuur met meerdere logische partities", scaledwidth="50", width="400", align="center"]
+
+==== GPT layout
+De disk-layout met het MBR wordt tegenwoordig nog vaak gebruikt. Toch zijn er enkele belangrijke nadelen:
+
+* Partitiegrootte is beperkt tot 2TB, wat met de huidige nieuwe harde schijven problematisch wordt.
+* De partitietabel is een erg belangrijk stukje data op de schijf, maar het wordt op geen enkele manier beschermd. Als deze cluster defect is, dan is het moeilijk om de logische layout van de schijf te achterhalen.
+
+De GPT layout probeert hier oplossingen voor te verzinnen. Zo staat de partitietabel ook op het einde van de schijf, zodat een defect in het begin van de schijf niet hoeft te betekenen dat je de data op de partities kwijt bent. De eerste sector van een GPT-schijf bevat een valse MBR-record (protective MBR) om oude partitioneringstools te misleiden. +
+Het maximale aantal partities is bij GPT 128 stuks. De grootte voor elke partitie is geen limiet meer. (om precies te zijn: bij sectoren van 512 bytes kan je 2^64 *512 bits opslaan in elke partitie.)+
+Elke partitie-entry bij GPT bevat volgende gegevens:
+
+|===
+|#bytes		|Naam					|Beschrijving
+
+|16 bytes	|Partition Type GUID	|Bevat een GUID die zegt over welk soort partitie het gaat. Vb Linux Swap Partition, Windows Basic Data Partition, Apple HFS+ partitie, …
+|16 bytes	|Unique Partition GUID	|Unieke GUID voor deze partitie
+|8 bytes	|Starting LBA			|Begin van de partitie
+|8 bytes	|Ending LBA				|Einde van de partitie
+|8 bytes	|Attribute bits			|Extra info over de partitie
+|72 bytes	|Partition name			|Leesbare naam voor de partitie
+|===
+ 
+.GPT versus MBR layout (bron: Microsoft Technet)
+image::ch04/images/MBRvsGPTbrontechnet.jpg[alt="partitiestructuur", scaledwidth="50", width="400", align="center" ]
+
+
+
+===	Bestandssystemen
+==== Algemeen
+Een bestandssysteem bestaat uit verschillende lagen die elk van de diensten van de onderliggende lagen gebruik maken.
+
+. Op het bovenste niveau is er het *logische bestandssysteem*. Dit is het niveau waarmee de gebruiker in contact komt. Hier wordt er met bestandsnamen, protecties, enz. gewerkt. Dit niveau beheert ook de directories die als speciale gegevensbestanden beschouwd worden.
+. Het logische bestandssysteem maakt gebruik van de *bestandsorganisatie* die de verbinding vormt tussen het logische en het fysieke niveau. Hier wordt aan het beheer van de vrije schijfruimte gedaan, hier worden de bestandsnamen omgezet naar de logische schijfadressen.
+. Het fysieke bestandssysteem krijgt van de bestandsorganisatie de logische schijfadressen binnen en vertaalt deze naar fysieke schijfadressen voor de betreffende schijven.
+. IO-controle: dit zijn de drivers voor de schijven. Deze drivers verbergen alle details van de schijfhardware voor de bovenliggende lagen.
+
+
+Een bestandssysteem zal de bestanden op een partitie organiseren en zorgen dat het besturingssysteem over voldoende informatie beschikt om elk bestand terug te vinden. Er zijn veel verschillende soorten bestandssystemen, we zullen ons hier beperken tot FAT16 en NTFS. Eigenschappen van andere bestandssystemen zullen in de cursus besturingssystemen nog besproken worden. 
+
+Elke partitie begint met een Partition Boot Sector (PBS). Dit is dus weer de eerste fysieke sector die bij een bepaalde partitie behoort. De PBS bestaat op zijn beurt ook weer uit twee delen. Helemaal vooraan staat een spronginstructie naar de eventueel aanwezige boot routine. Deze boot routine zal het besturingssysteem laden (dus op elke partitie waarop een besturingssysteem geïnstalleerd is, zullen een dergelijk programma en spronginstructie terug te vinden zijn). +
+Daarnaast is er het BIOS Parameter Block. Dit gedeelte bevat een aantal parameters die belangrijk zijn om toegang te krijgen tot het bestandsysteem. Welke parameters hier terug te vinden zijn, hangt natuurlijk af van het type bestandssysteem. 
+
+==== Bestanden
+
+Bij bestanden is er steeds het probleem van organisatie: hoe plaats je de clusters waaruit zo'n bestand bestaat op de schijf? 
+Er zijn verschillende mogelijkheden: 
+
+* Contigu 
+* Gelinkt 
+* Gebaseerd op een allocatietabel
+* Gebaseerd op een indextabel.
+
+De keuze van een bepaalde methode zal onder meer afhangen van de manier waarop de gegevens van een schijf gebruikt zullen worden: sequentieel, direct of geïndexeerd, en van de prestaties die men van de schijf verwacht. +
+Doordat de schijf zeer traag is in vergelijking met de processor, zal men doorgaans trachten om het aantal toegangen naar de schijf zoveel mogelijk te beperken door bepaalde tabellen in het geheugen te houden, door gegevens intelligent over de schijf/schijven te verdelen zodat de kopbewegingen beperkt worden, enz. Vaak kan het de moeite lonen om de processor een complexer algoritme te laten uitvoeren indien dit het gebruik van de schijf kan verminderen.
+
+===== Contigue allocatie
+
+Contigue allocatie is de eenvoudigste allocatiemethode Een bestand bestaande uit n blokken zal n opeenvolgende fysieke blokken op de schijf innemen. De verplaatsingen van de lees/schrijfkop zullen hierdoor minimaal zijn: bij het sequentieel lezen zal de kop enkel op het einde van het laatste spoor van een cilinder moeten veranderen naar een volgende cilinder en ook bij directe toegang zullen de verplaatsingen van de kop minimaal zijn. Contigue allocatie is hierdoor de snelste allocatiemethode.
+
+.Contigue allocatie
+image::ch04/images/allocatie/contigue.jpg[alt="contigue allocatie", scaledwidth="50", width="400", align="center" ]
+
+Ze heeft echter ook heel wat nadelen. Vooreerst is er het probleem van de externe fragmentatie. Doordat het schijfgeheugen dat gealloceerd moet worden contigu moet zijn heeft men in werkelijkheid stukken geheugen van ongelijke lengte waarvoor het geheugenbeheer relatief moeilijk is. Compactering kan hier een oplossing brengen, maar meestal zal het bestandssysteem tijdens het compacteren onbruikbaar zijn. Dit is niet steeds aanvaardbaar.
+
+Ten tweede is er het probleem dat men nog vóór de creatie van een bestand moet weten hoe groot het zal worden. Schat men de werkelijke grootte te hoog, dan krijgt men een aanzienlijke interne fragmentatie, schat men het te klein, dan zal het programma dat het bestand aanmaakt afgebroken worden. Dit laatste kan vermeden worden door in dat geval het bestand te kopiëren naar een grotere vrije ruimte en daar de uitvoering verder te zetten. Het hoeft geen betoog dat dit de turn around time van een proces negatief zal beïvloeden. Langzaam groeiende bestanden zoals log-bestanden zijn vrij moeilijk efficiënt te implementeren.
+
+Sommige systemen laten daarom toe om de contigue allocatie stuksgewijs te ondersteunen. Men begint dan met een bestand met een gegeven grootte, en indien het te klein zou blijken te zijn, kan men een bijkomende uitbreiding toevoegen. De grootte van deze uitbreiding moet ook op voorhand vastgelegd worden. Ofschoon deze oplossing efficiënter is dan het volledig kopi\"en van het bestand, heeft ze ook te lijden onder het probleem van de externe fragmentatie.
+
+===== Gelinkte allocatie 
+
+Deze allocatiemethode lost alle externe-fragmentatieproblemen van de contigue allocatie op. In de plaats van alle blokken contigu op de schijf op te slaan worden de blokken op de schijf met elkaar gelinkt (zie figuur \ref{gelinkte}). Zolang er vrije blokken zijn, kan een bestand blijven groeien. Ofschoon deze methode het probleem van de externe fragmentatie effectief oplost, heeft ze ook haar problemen. Vooreerst wordt directe toegang nagenoeg onmogelijk omdat steeds de lijst van blokken moet afgelopen worden. Ten tweede kan het sequentieel lezen van een bestand zeer traag worden omdat er per nieuw in te lezen blok in principe een verplaatsing van de kop kan nodig zijn. Ten derde zullen de blokken nu een beetje kleiner zijn omdat de link naar het volgende blok ook moet opgenomen worden. Tenslotte is gelinkte allocatie ook niet zeer betrouwbaar omdat van zodra er één blok corrupt wordt de hele schijf onbetrouwbaar wordt.
+
+.Gelinkte allocatie
+image::ch04/images/allocatie/gelinkte.jpg[alt="gelinkte allocatie", scaledwidth="50", width="400", align="center" ]
+
+Om het sequentieel lezen te versnellen kan men bij de allocatie van de blokken er trachten voor te zorgen dat ze toch zoveel mogelijk sequentieel op de schijf staan zodat de bewegingen van de lees/schrijfkop beperkt worden. Bijgevolg kan de contiguïteit en dus de snelheid door regelmatig te compacteren verbeterd worden. 
+
+Het derde probleem kan minder erg gemaakt worden door de blokgrootte te vergroten. Gezien er slechts één link per blok opgeslagen wordt, verkleint hierdoor het percentage aan links.
+
+===== Allocatietabel
+
+De overige problemen kunnen opgelost worden door alle wijzers naar de blokken bij te houden in afzonderlijke blokken, de zogenaamde FAT of file allocation table. 
+
+Deze tabel bevat een wijzer per blok. In de plaats van de wijzers fysiek in de blokken te schrijven worden ze nu in de FAT geschreven. 
+
+Dit heeft als voordelen:
+
+*  om een bestand te zoeken moet men slechts een paar blokken van de schijf lezen(de FAT)
+* er moeten geen wijzers meer in de gegevensblokken opgeslagen worden
+* men kan de FAT meer dan eens kan opslaan op de schijf om beperkte schijfdefecten op te vangen. 
+
+Vrije blokken kunnen teruggevonden worden door een speciaal teken op de plaats van de wijzer in de FAT. MS-DOS en OS/2 maken gebruik van een FAT.
+
+Meestal bewaart men een kopie van de FAT (of delen ervan) in het geheugen om snel een blok op de schijf terug te kunnen vinden. Indien de FAT niet in het geheugen bijgehouden wordt, zal het telkens heen en terug swingen tussen de FAT-blokken en de werkelijke gegevens een aanzienlijke extra belasting van de schijf vormen.
+
+.Allocatietabel
+image::ch04/images/allocatie/allocatietabel.jpg[alt="tabel voor allocatie", scaledwidth="50", width="400", align="center" ]
+
+===== Indextabel
+
+Gelinkte allocatie of allocatietabellen zijn een afdoende oplossing voor het probleem van de externe fragmentatie, maar laten geen efficiënte directe toegang tot een bestand toe omdat de links sequentieel moeten afgelopen worden. Geïndexeerde allocatie laat dit wel toe. Het idee is dat alle wijzers naar de gealloceerde blokken sequentieel opgenomen worden in een zogenaamd indexblok. Dit indexblok kan dan gebruikt worden om een gegevensblok rechtstreeks terug te vinden.
+
+.Geïndexeerde allocatie
+image::ch04/images/allocatie/indextabel.jpg[alt="index voor allocatie", scaledwidth="50", width="400", align="center" ]
+
+Om niet beperkt te zijn tot bestanden met een te kleine maximale lengte kan men ofwel de indexblokken linken, ofwel verschillende niveaus van indexblokken creëren. Het topniveau verwijst dan naar indexblokken die op hun beurt verwijzen naar de gegevensblokken. Gecombineerde systemen komen ook voor.
+
+Geïndexeerde allocatie maakt doorgaans minder efficiënt gebruik van de schijfruimte dan gelinkte allocatie. De meeste indexblokken zullen immers maar gedeeltelijk gevuld zijn. Bovendien zal men voor kleine bestanden i.p.v. een paar wijzers in de gegevensblokken zelf, een volledige indexblok moeten alloceren.
+ 
+
+[NOTE]
+.Opmerking: optimalisatie
+====
+De bovenstaande methodes zijn enkel de basisprincipes voor het beheer van bestanden op een schijf. In de praktijk zijn er veel variaties mogelijk om een snellere werking van het bestandssysteem te verkrijgen.
+In het bijzonder zal het nuttig blijken om:
+
+* De blokken zo groot mogelijk te nemen, rekening houdend met de interne fragmentatie dat dit met zich mee zal brengen. BSD Unix verandert de grootte van de blokken zelfs naarmate het bestand groter wordt. Dit laat toe om het percentage interne fragmentatie toch nog laag te houden.
+* De dynamische informatie in de directories beperkt te houden. Het bijhouden van het tijdstip waarop een bestand voor het laatst gebruikt werd zal een schrijfoperatie veroorzaken ook indien het bestand enkel gelezen werd.
+* Zoveel mogelijk blokken van de schijf in het geheugen te bewaren om meer dan eens lezen te vermijden. Sommige schijfregelaars zullen i.p.v. een sector steeds een volledig spoor inlezen omdat zij ervan uitgaan dat door de lokaliteit meer dan één sector zal gelezen worden. De meeste besturingssystemen hebben ook voorzieningen voor \textit{disk caches}. Solaris en Linux zal al het ongebruikte interne geheugen ter beschikking stellen als disk cache (zowel voor bestands-IO als voor paginering).
+* Free-behind - Read-ahead zijn twee methodes die naast LRU gebruikt kunnen worden om de disk cache beter te beheren bij sequenti\"ele toegang. Free-behind zal een blok vrijgeven van zodra een volgend blok ingelezen werd, en read-ahead zal ervoor zorgen dat er steeds 1 blok verder ingelezen wordt in een blokbuffer om de wachttijden bij het effectief opvragen van gegevens uit dat blok te beperken.
+* Om de schijfcapaciteit beter te benutten kan men de gegevens gecomprimeerd op de schijf plaatsen. Afhankelijk van het soort van gegevens dat men wil opslaan kan de hoeveelheid die men op deze manier kan opslaan een veelvoud zijn van de originele schijfcapaciteit. Bovendien kan de bandbreedte naar de schijf hierdoor in sommige gevallen vergroot worden omdat er minder gegevensuitwisseling zal zijn met de schijf terwijl het comprimeren en decomprimeren vrij snel kan gaan. Deze compressie is totaal transparant voor de gebruiker.
+====
+
+==== Mappen (directories)
+Tegenwoordige hebben de meeste bestandssystemen een boomvormige directorystructuur waarbij alle gebruikers voorkomen als deelbomen van de boomstructuur die geassocieerd wordt met het volume. In deze vorm heeft de gebruiker beschikking over subdirectories die op hun beurt bestanden en subdirectories kunnen bevatten. Bestanden hebben nu niet enkel een naam, maar ook een pad, dit is een opeenvolging van de namen van subdirectories. Het pad en de bestandsnaam vormen dan een eenduidige specificatie van een bestand. Doordat alle gebruikers opgenomen zijn in dezelfde boomstructuur is het ook mogelijk om naar bestanden van andere gebruikers te refereren door zowel hun padnaam als hun bestandsnaam op te geven.
+
+Padnamen kunnen zowel absoluut (ten opzichte van de root-directory), als relatief (ten opzichte van de huidige directory) zijn. Absolute padnamen hebben als voordeel dat ze in alle omstandigheden verwijzen naar dezelfde directory, maar ze kunnen hierbij wel aardig lang worden (100 tekens zijn geen uitzondering). Relatieve padnamen hebben als voordeel dat ze korter kunnen zijn, en dat ze in zekere zin `positie-onafhankelijk' zijn, dit wil zeggen dat ze binnen een bepaalde boomstructuur geldig blijven, ook wanneer de totale boom verplaatst wordt.
+
+Boomvormige directorystructuren hebben echter ook hun nadelen: 
+
+. men zal het concept van `huidige directory' moeten invoeren om te weten in welke directory men aan het werken is, 
+. om bestanden terug te vinden kan men in verscheidene directories moeten gaan kijken, en soms wil men hierbij een bepaalde volgorde kiezen (PATH), 
+. er moeten voorzieningen getroffen worden om bepaalde bestanden in meer dan één directory op te nemen zonder deze te moeten kopiën of telkens opnieuw de volledige padnaam te moeten ingeven.
+
+Om aan dit euvel te verhelpen bestaan er directorystructuren die kunnen voorgesteld worden door een acyclische graaf die zal toelaten dat een bepaald bestand in twee subdirectories voorkomt.
+
+Om dit te realiseren kan men gebruik maken van zogenaamde links of shortcuts. Unix onderscheidt twee soorten links: symbolische links en harde links. Een symbolische link is gewoon een verwijzing naar een ander bestand. Uitwendig ziet een symbolische link eruit als een gewoon bestand, maar het is wel een bestand van een speciaal type, en het bevat geen gegevens, enkel de naam van het bestand waarnaar het wijst. Als het bestand waarnaar gewezen wordt verdwijnt, dan zal de symbolische link blijven bestaan, maar verwijzen naar een niet langer bestaand bestand.
+
+De tweede soort link is de harde link. Deze is te vergelijken met het delen van geheugen door dezelfde frame-adressen op te nemen in twee paginatabellen. In dit geval zullen twee entries in de directorytabel wijzen naar hetzelfde fysieke bestand. Hierbij wordt een teller bijgehouden met het aantal links die verwijzen naar het bestand. Het wissen van een harde link zal enkel het wissen van het bestand tot gevolg hebben indien deze link de laatste link met een bestand was. Dit verklaart meteen waarom het wissen van een bestand in Unix soms ook unlink genoemd wordt. Voorbeelden van harde links zijn de bestanden '.' en '..' in de directories. Zij komen zowel voor in de huidige directory als in de ouderdirectory.
+
+Het gebruik van links zorgt ervoor dat een directorystructuur niet langer een boomstructuur is maar een graaf. Indien er geen lussen voorkomen in de graaf spreekt men van een acyclische graaf. Een probleem met grafen is dat het doorzoeken van een graaf op zoek naar bepaalde informatie (bv. een bestand) complexer is dan het doorzoeken van een boom omdat men moet vermijden tweemaal hetzelfde deel van een graaf te doorzoeken. Bij acyclische grafen heeft het meermaals doorzoeken van een graaf enkel een effect op de snelheid waarmee een algoritme uitgevoerd wordt. Bij cyclische grafen kan dit aanleiding geven tot oneindige lussen, en dus een niet-terminerend algoritme.
+
+==== Swapruimte
+
+Zoals aangetoond wordt in het hoofdstuk over geheugenbeheer is het effect van een paginafout op de uitvoeringssnelheid van een programma dramatisch en moet men dan ook al het mogelijke doen om de interactie met de swapruimte zo efficiënt mogelijk te maken. We hebben gezien dat een virtueel-geheugensysteem gebruik maakt van pagina's en dat deze pagina's in paginering op aanvraag moeten kunnen uitgewisseld worden met de swapruimte.
+
+Deze pagina's zullen direct moeten kunnen geadresseerd worden. Met de technieken die gebruikt worden bij het klassieke bestandsbeheer zal deze directe toegang soms het lezen van meer dan één blok tot gevolg hebben. Bovendien zijn de blokken van het bestandssysteem niet steeds even groot als de pagina's en de frames.
+
+Men zal dan ook meestal verkiezen om de swapruimte onder te brengen in een afzonderlijke partitie met een eigen beheerssysteem waardoor het aantal schijftoegangen absoluut minimaal gehouden wordt bij het pagineren. Het voornaamste nadeel van deze aanpak is dat de swapruimte bij de generatie van het besturingssysteem moet vastgelegd worden (in de vorm van een partitie). Naderhand uitbreiden (als gevolg van het vergroten van het intern geheugen) is moeilijk omdat het het uitbreiden van een schijfpartitie betreft. Anderzijds zal bij een overdimensionering van de swapruimte de ongebruikte ruimte niet gebruikt kunnen worden voor bestandsopslag. Deze oplossing, ofschoon efficiënt, is heel wat minder flexibel dan het gebruik van een gegevensbestand als swapruimte.
+
+Sommige systemen zoals Windows alloceren de swapruimte als een contigu bestand. Het voornaamste voordeel van deze aanpak is de eenvoud en het feit dat de swapruimte gemakkelijk kan uitgebreid worden. Het nadeel van deze aanpak is de traagheid omdat elke toegang tot de swapruimte via het bestandssysteem moet gaan.
+
+De keuze tussen beide is een compromis tussen gewenste snelheid en gebruikersgemak.
+
+==== Vrije ruimte
+De vrije ruimte op een schijf moet op een efficiënte manier kunnen bijgehouden worden om snel een vrij blok te kunnen terugvinden. Een aantal gebruikelijke methoden wordt hier besproken.
+
+Bitmap:: Er wordt een bitrij bijgehouden waarbij elk bitje een blok voorstelt. Een vrij blok kan dan voorgesteld worden door 1, en een blok dat in gebruik is door een 0. Voor grote schijven kunnen de bitmaps ook een aanzienlijke ruimte in het geheugen gaan innemen. Ze moeten nu en dan op de schijf bewaard worden als beveiliging. Na een systeemcrash zal deze lijst opnieuw moeten opgebouwd worden uitgaande van de bestanden die op de schijf teruggevonden worden.
+
+Gelinkte lijst:: Gezien de vrije blokken toch niet gebruikt worden, kan een deel van elk blok gebruikt worden om ze met elkaar te linken. De kop van de lijst wijst steeds naar een vrij blok indien er een aanwezig is. Nadeel van deze methode is dat indien er bijvoorbeeld 100 blokken moeten gealloceerd worden, er ook 100 schijftoegangen nodig zijn om de gelinkte lijst af te lopen.
+
+Wijzerblok:: Net zoals bij de gelinkte allocatie kunnen ook de vrije blokken in indexblokken opgenomen worden. In dit geval zal men meestal kiezen voor gelinkte indexblokken i.p.v. voor verschillende niveaus. Het voordeel van deze methode is dat men verschillende blokken ineens kan alloceren.
+
+
+==== Fragmentatie 
+Welke allocatiemethode men ook gebruikt na verloop van tijd zal de vrije ruimte geen aaneengesloten blok meer vormen, maar verspreid geraken over de volledige schijf. Het gevolg van deze versnippering zal zijn dat bestanden opgebouwd zullen worden uit blokken die zich op verschillende plaatsen op de schijf bevinden (behalve bij contigue allocatie). Doordat de kop van de schijf zich verschillende keren zal moeten verplaatsen om een dergelijk bestand te lezen, zal de prestatie van het bestandssysteem sterk dalen. Dit probleem is gekend, en wordt fragmentatie van de schijf genoemd.
+
+Het probleem kan opgelost worden door de bestanden op de schijf te herschikken (defragmentatie en compactering). Hierbij zullen alle bestanden contigu gemaakt worden en wordt ook de vrije ruimte samengebracht. Deze techniek heeft zijn aanhangers en zijn tegenstanders. Aanhangers claimen dat de fragmentatie van de bestanden weggewerkt wordt hetgeen nuttig is voor de prestatie. Tegenstanders argumenteren dat door de compactie de volgorde van bestanden gewijzigd wordt, en dat dit een negatieve impact kan hebben op de prestatie. Indien men een pakket installeert op een nagenoeg lege schijf, is de kans groot dat alle bestanden van het pakket na elkaar op de schijf zullen komen te staan. Bij het opstarten van het pakket kunnen de bestanden dan één na één ingelezen worden, zonder dat de kop zich veel moet verplaatsen. Na compactering kunnen deze bestanden verspreid geraken over heel de schijf waardoor er tijd verloren wordt bij het springen van het ene bestand naar het andere.
+
+==== Een bestandssysteem 'mounten'
+
+Het secundair geheugen van een computersysteem kan uit verscheidene schijven bestaan. Deze schijven kunnen op verschillende manieren aan de gebruiker aangeboden worden. Ofwel krijgen ze een naam zoals in Windows: A: B: C: enz. waardoor ze expliciet zichtbaar blijven, ofwel worden ze opgenomen als subdirectory in een bestandssysteem waardoor ze transparant worden voor de gebruiker. (zoals bij unix/linux het geval is)
+
+Men kan de directories van een bestandssysteem verdelen over de schijven, of met andere woorden, een schijf met haar eigen bestandssysteem (of systemen) wordt als subdirectory van het bestandssysteem van een andere schijf beschouwd. Dit laat toe om bestandssystemen te creëren die groter zijn dan één fysiek volume. Indien een schijf niet fysiek aanwezig is (bij DVD-stations bijvoorbeeld), zal deze subdirectory gewoon leeg zijn; indien de schijf aanwezig is, zal men in deze directory gegevens kunnen opvragen en bewaren. Eenmaal geconfigureerd is dit totaal transparant voor de gebruiker.
+
+==== Types: journaling file systems 
+Bestandssystemen zijn meestal grote datastructuren, veranderingen eraan veroorzaken meestal meerdere schrijfoperaties aan bestanden en directories. Dit introduceert een race-conditie, waarbij een onderbreking (zoals een stroomstoring of systeemcrash) kan leiden tot een inconsistente toestand.
+
+Bijvoorbeeld, het wissen van een bestand op een UNIX systeem veroorzaakt twee stappen:
+
+. het verwijderen van de directory-ingang
+. item het aanduiden van de bestandsinode als vrij ruimte
+
+Als stap 1 uitgevoerd wordt net voor een crash dan zal er een inode als wees achterblijven. +
+Omgekeerd als stap 2 als eerste voor de crach uitgevoerd wordt dan wordt de inode als vrije ruimte aangeduid en kan overgeschreven worden.
+
+Een manier tot herstel is om de complete datastructuren van het bestandssysteem te doorlopen bij een volgende aankoppeling zodat onvolkomenheden kunnen gedetecteerd worden. Dit kan zeer traag verlopen voor grote bestandssystemen.
+
+Een andere manier tot herstel is om een logbestand (journaal) bij te houden met alle veranderingen die moeten gemaakt worden. +
+Herstellen kan dan eenvoudig door het logbestand te doornemen en alle onvolkomenheden te herstellen.
+
+Enkele voorbeelden van journalizing bestandssystemen zijn JFS, EXT3/4, ReiserFS en NTFS
+
+
+==== Case study 1: FAT file system
+
+Het FAT bestandssysteem komt voor in een aantal varianten, waarvan FAT16 (1986) en FAT32 (1996) ontegensprekelijk de bekendste zijn. Als primair bestandssysteem hebben ze allebei reeds lang afgedaan om redenen die later aan bod komen, maar ze vormen wel een ideale educatieve instap in de wereld van bestandssystemen. Recentere bestandssystemen zijn een stuk complexer, zoals we later zullen leren. FAT wordt tegenwoordig vanwege zijn eenvoud wel nog gebruikt op USB dongles, flash kaartjes etc.
+ 
+
+.FAT organisatie
+image::ch04/images/FATorganisatie.png[alt="fat organisatie", align=center, width="700", scaledwidth="70"]
+
+In bovenstaande afbeelding zie je de opbouw van een FAT16 partitie. Vooraan bevindt zich zoals altijd het PBS met de nodige parameters. De PBS is één van de gereserveerde sectoren vooraan de partitie. Onmiddellijk na de gereserveerde sectoren volgen een aantal File Alocation Tables (FATs). In de figuur is dit aantal gelijk aan twee, het meest voorkomende geval. +
+Na de FATs komt de root folder, gevolgd door de data clusters. In deze data clusters worden uiteraard de bits opgeslagen die de bestanden vormen. Belangrijke opmerking is dat deze bits georganiseerd worden in clusters. Een cluster is een reeks sectoren die steeds bij een welbepaald bestand horen. +
+Bijvoorbeeld: indien een cluster bestaat uit 16kB (32 sectoren), dan zal een bestand van 1kB 16kB schijfruimte bezetten (een sector).  +
+Een bestand van 20kB zal verspreid worden over twee clusters, deze clusters moeten geen opeenvolgende clusters zijn (fragmentatie). +
+Soms kan je de grootte van de clusters kiezen (bij het formatteren, afhankelijk van het bestandsysteem). Grotere clusters betekent dat bestanden minder snel gefragmenteerd zullen worden, maar betekent anderzijds dat meer ruimte verloren zal gaan (door onvolledig gevulde clusters).
+
+.PBS van een FAT32 partitie
+[format="csv",options="header" ]
+|===
+Offset, beschrijving,grootte
+00h,Jump Code + NOP,3 Bytes
+03h,OEM Name (Probably MSWIN4.1),8 Bytes
+0Bh,Bytes Per Sector,1 Word
+0Dh,Sectors Per Cluster,1 Byte
+0Eh,Reserved Sectors,1 Word
+10h,Number of Copies of FAT,1 Byte
+11h,Maximum Root DirectoryEntries (N/A for FAT32),1 Word
+13h,Number of Sectors inPartition Smaller than 32MB (N/A for FAT32),1 Word
+15h,Media Descriptor (F8h forHard Disks),1 Byte
+16h,Sectors Per FAT in Older FATSystems (N/A for FAT32),1 Word
+18h,Sectors Per Track,1 Word
+1Ah,Number of Heads,1 Word
+1Ch,Number of Hidden Sectors inPartition,1 Double Word
+20h,Number of Sectors inPartition,1 Double Word
+24h,Number of Sectors Per FAT,1 Double Word
+28h,Flags ,1 Word
+2Ah,"Version of FAT32 Drive (HighByte = Major Version, Low Byte = Minor Version)",1 Word
+2Ch,Cluster Number of the Startof the Root Directory,1 Double Word
+30h,Sector Number of the FileSystem Information Sector (See Structure Below)(Referenced from the Start of the Partition),1 Word
+32h,Sector Number of the BackupBoot Sector (Referenced from the Start of the Partition),1 Word
+34h,Reserved,12 Bytes
+40h,Logical Drive Number ofPartition,1 Byte
+41h,Unused (Could be High Byteof Previous Entry),1 Byte
+42h,Extended Signature (29h),1 Byte
+43h,Serial Number of Partition,1 Double Word
+47h,Volume Name of Partition,11 Bytes
+52h,FAT Name (FAT32),8 Bytes
+5Ah,Executable Code,420 Bytes
+1FEh,Boot Record Signature (55hAAh),2 Bytes
+|===
+
+Hierboven zie je de inhoud van de partition boot sector van een FAT32 partitie. 
+We zullen niet alle parameters aanhalen, maar wel aantonen hoe het besturingssysteem een welbepaald bestand kan terugvinden en hoe het daarbij gebruik maakt van de opgeslagen informatie.
+
+FAT32 heeft de volgende voordelen tegenover FAT16:
+
+. FAT32 kan met grotere harde schijven (max. 2 Terabyte) werken dan FAT16 (max. 2 GB).
+. In FAT16 zijn er maar 512 entries mogelijk in de hoofddirectory. Met lange bestandsnamen die meerdere entries innemen kan dit al snel problemen geven. Daarom wordt de hoofddirectory in FAT32 opgeslagen zoals een gewone directory, zodat er een onbeperkt aantal entries in kunnen.
+. FAT32 gebruikt kleinere clusters, zodat er minder slack is. Dit is vooral van belang voor grotere schijven. Op een schijf van 2 GB kan je bijvoorbeeld gemakkelijk 200 tot 300 MB winnen met FAT32 (dat is 10 tot 15%).
+. De beide FAT-tabellen staan niet meer in het begin van de schijf, zodat ze minder snel beschadigd worden.
+
+In onderstaande afbeelding zie je de PBS van een SD-kaartje dat uit een Android smartphone komt. De sector werd hexadecimaal voorgesteld met een hex-editor. Probeer enkele van de eerder aangehaalde parameters terug te vinden. (de entries zijn gelijkaardig aan de entries voor een FAT16 partitie)
+
+
+.hexadecimale voorstelling van de PBS van een FAT16 SD-kaart
+image::ch04/images/hexviewpbs.png[width="700",scaledwidth="200",align="center"]
+
+De root folder bevat al de informatie over bestanden en mappen die opgeslagen zijn op de root folder. Als we ons beperken tot namen die voldoen aan het 8.3 formaat, dan is elk element in de root folder 32 bytes groot. Een belangrijk deel hiervan zijn de eerste elf bytes, die de karakters van de naam bevatten. +
+Indien een bestand niet in de root folder zit, maar is ondergebracht in een andere map, kan vanuit de root folder het volledige pad gevolgd worden tot we uiteindelijk in de juiste map terecht komen. Daar staat de informatie dan op gelijkaardige manier opgeslagen als in de root folder.
+
+.Voorbeeld: zoeken van een bestand in een FAT-partitie.
+====
+. De eerste stap is het opzoeken van de root folder. Uit het partition boot sector kan je de structuur van de partitie afleiden:
+		* het aantal gereserveerde sectoren
+		* het aantal FAT’s 
+		* het aantal sectoren per fat
+		* aantal bytes per sector
+. Op basis hiervan kan het besturingssysteem bepalen op welk sectornummer de root folder start (start root = aantal gereserveerde sectoren + aantal FAT’s * aantal sectoren per FAT). Merk op dat in het PBS ook het aantal bytes per sector is opgegeven, zodat je ook het byte-adres kan berekenen (sectornummer * aantal bytes per sector).
+. Zodra het adres van de root folder gevonden is kan het besturingssysteem op zoek naar de naam van het gevraagde bestand. 
+. Als dan het juiste element in de root folder gevonden is (op basis van bestandsnaam), kan de overige informatie gebruikt worden om het bestand terug te vinden op de partitie. 
+Vooral de laatste 4 bytes zijn belangrijk. Die bevatten namelijk de lengte van het bestand (in bytes) en de 16 bits daarvoor bepalen het eerste clusternummer waar er data terug te vinden is. 
+. Op basis van het clusternummer moet het besturingssysteem gaan kijken in de FAT tabel om zo te weten te komen als het bestand bestaat uit één dan wel uit meerdere clusters. 
+		* De verschillende FAT-tabellen zijn in principe (tenzij er fouten optreden) kopieën van elkaar, dus maakt het in principe niet uit in welke tabel gekeken wordt. 
+		* Bij FAT16 bestaat elk element in de FAT tabel uit 16 bits. Elk element is gelinkt met een welbepaald clusternummer (element 2 hangt samen met cluster 2, element 3 hangt samen met cluster 3, ...). 
+		* De inhoud van de twee bytes bepalen hoe een cluster samenhangt met de andere: 
+
+		** 0000h: 		Available Cluster
+		** 0002h-FFEFh	used, Next Cluster in File
+		** FFF0h-FFF6h 	reserved Cluster
+		** FFF7h		BAD Cluster
+		** FFF8h-FFFF	Used, Last Cluster in File
+
+		* Op basis van het eerste clusternummer kan het besturingssysteem alle clusters en de volgorde waarin ze een bestand vormen terug vinden. Het komt er dan op aan om alle clusters volledig uit te lezen, behalve het laatste cluster, waarvan enkel voldoende bytes gelezen moeten worden om in totaal aan de in de root folder terug te vinden grootte te voldoen.
+====
+ 
+.voorbeeld FAT-tabel met fragmentatie
+image::ch04/images/FAT16example.png[align="center",scaledwidth="40",width="500",alt="FAT-tabel met fragmentatie"]
+
+==== Case study2: NTFS
+
+NTFS is een bestandssysteem dat standaard gebruikt wordt op alle recente Windows versies. Het is een gesloten systeem, ontstaan door een doorontwikkeling van HPFS, een samenwerking tussen IBM en Microsoft. +
+NTFS werkt op een andere manier dan FAT16 en zal dus ook andere informatie opslaan in de PBS. NTFS maakt bijvoorbeeld geen gebruik van FATs, dus zal er ook geen aantal FATs of grootte van de FAT opgegeven worden in de PBS. NTFS maakt gebruik van een Master File Table (MFT), waarin alle relevante informatie over een bestand wordt opgeslagen.
+
+Deze informatie is een stuk uitgebreider dan in de root folder van een FAT systeem, het is zelfs mogelijk dat voor een klein bestand de data volledig in de MFT wordt opgeslagen. Is dit niet het geval, dan is voor het opzoeken van het bestand de meest relevante informatie die in het MFT aanwezig is, de naam van het bestand en de runlist. +
+Bij het opzoeken van een bestand is de eerste stap dus het terugvinden van de MFT. Hiervoor staat in het PBS het cluster nummer opgegeven waar het MFT start. Aangezien in het PBS ook het aantal sectoren per cluster terug te vinden zijn, kan weer het sector adres van de MFT teruggevonden worden. Binnen de MFT zal gezocht moeten worden op de naam van het gevraagde bestand. Als het betreffende record dan wordt teruggevonden, kan binnen dit record de runlist worden opgezocht. +
+De runlist is onderdeel van het $DATA attribuut (start van dit attribuut wordt gekenmerkt door 80H), waarbinnen ook de ingenomen en werkelijke grootte van het bestand terug te vinden is. De runlist bestaat uit een aantal opeenvolgende bytes: 
+
+.opbouw van een runlist		
+. Het eerste byte wordt opgesplitst in twee nibbles.
+		* Het meest significante nibble duidt aan hoeveel bytes gebruikt worden voor de offset (stel K) 
+ 		* Het minst significante nibble geeft aan hoeveel bytes gebruikt worden voor de lengte (stel N) 
+. De volgende N bytes geven in little endian notatie aan hoeveel clusters na elkaar in gebruik zijn voor deze stream. 
+. De volgende K bytes geven aan op welke clusteroffset de stream begint (weer in little endian notatie). 
+
+Indien het volgende byte 0x00 is, eindigt de runlist hier, anders moet je vanaf hier de bytes weer op dezelfde manier interpreteren.
+
+.interpretatie van een runlist
+====
+runlist = _31 0A 21 23 05 00 34_ ... 
+
+Het eerste byte geeft aan dat het eerstvolgende het aantal clusters bepaalt en de drie daarop volgende een offset. Daarna volgt er 00, dus verder geen data. Dus de data staat in 10 clusters te beginnen vanaf cluster 0x052321. Op deze manier is het mogelijk om verschillende reeksen clusters in de juiste volgorde te gaan lezen. 
+
+Van de laatste cluster moeten weer net genoeg bytes gelezen worden om evenveel bytes te lezen als opgegeven bij de werkelijke grootte van het bestand.
+====
+
+==== case study 3: Ext4
+
+EXT staat voor Extended file system. Dit bestandssysteem bouwt verder op standaard linux file systems. Het wordt gezien als een brug tussen Ext3 en de meer geavanceerde bestandssystemen, en is tegenwoordig zowat op alle linux distributies standaard. (al lijkt het rijk van EXT bedreigd: bijvoorbeeld op RHEL is tegenwoordig XFS de standaard bestandsindeling. Ook op Android is EXT sinds versie 2.3 het default bestandssysteem. 
+
+===== Inodes
+In Unix maakt men gebruik van een gecombineerd systeem met inodes.
+
+Inodes komen voor in twee types: 
+
+Directory inodes::
+	Deze bevatten de info van een bepaalde map, met onder meer de subdirectories en bestanden.
+	Merk op dat deze inodes ook de bestandsnaam bevatten. 
+Data file inodes::
+	De data file inodes bevatten de informatie over waar een bepaald bestand kan gevonden worden op de schijf. Merk op dat deze inodes de bestandsnaam NIET bevatten. Door deze werkwijze kan je in principe twee verschillende bestandsnamen gebruiken voor één fysiek bestand. In Linux heet zoiets ‘hard-linking’.
+	Zo’n inode voor een bestand bevat Directe, single indirecte, double indirecte en zelfs triple indirecte verwijzigingen naar bestandslocaties. Deze constructie wordt snel duidelijker met een afbeelding:
+
+Hierbij wordt een vast aantal indices opgenomen als attributen van een bestand in de zogenaamde inode (dit is een gegevensstructuur die zich tussen de directory-entry en het fysiek bestand bevindt. Per fysiek bestand is er slechts 1 inode, maar kunnen er verschillende directory-entries zijn. De inode houdt o.m. bij hoeveel harde links er naar een bestand bestaan). Naast dit beperkt aantal directe indices (bv. 12) die zullen volstaan voor de bestanden kleiner dan bv. 48 Kb, is er nog een wijzer naar een indexblok van niveau 1, en ook nog een wijzer naar een indexblok van niveau 2 (en zelfs naar niveau 3).
+
+Deze oplossing laat toe om snel directe toegang te hebben tot kleine bestanden, redelijk snel tot de middelgrote bestanden, en aanvaardbaar voor de echt grote bestanden waarbij de grootte van de bestanden niet beperkt wordt door de implementatie van het bestandssysteem, maar door de grootte van de schijf. Dit is prima omdat in de praktijk toch blijkt dat minder dan 5% van alle bestanden groter zijn dan 48KB en dus een indexblok nodig hebben. Alle andere kunnen het stellen zonder afzonderlijk indexblok.
+
+
+ 
+.Inode structuur (bron onbekend)
+image::ch04/images/unix_filesys5.png[alt="inode structuur",width="500",scaledwidth="75",align="center"]
+
+==== Andere bestandssystemen
+
+Met de opgesomde bestandssystemen is de lijst uiteraard niet compleet.  Een niet limitatief overzichtje met de meest opvallende features. Deze zijn vaak niet toegankelijk met Windows, omdat Microsoft hiervoor geen drivers ontwikkelt.
+
+===== BTFRS
+BTFRS wordt algemeen beschouwd als de opvolger van EXT4 in Linux. Het bestandssysteem kan reeds gebruikt worden, maar wordt niet nog stabiel genoeg geacht voor productieomgevingen. Bij elke nieuwe versie van de Linuxkernel worden nieuwe features toegevoegd en bugs geplet.
+
+Features:
+
+*	Ondersteuning voor snapshots
+*	Ondersteuning voor quotas
+*	…
+
+===== ZFS
+ZFS werd oorspronkelijk ontwikkeld door SUN, en heeft een erg rijke featureset, die BTFRS en EXT4 ruim achter zich laat. Door conflicterende licenties is het niet standaard te vinden in linux-distributies, maar het kan meestal wel achteraf geconfigureerd worden.
+
+===== Re-Fs
+Dit nieuwe bestandssysteem is momenteel enkel ondersteund door Windows server 2012, en ervan booten is nog niet ondersteund. Het bevat enkele features die vooral bij kritieke data belangrijk zijn. 
+
+===== F2FS
+Dit nieuwe bestandssysteem is speciaal opgebouwd om een hoog rendement te halen op flash disks.
+
+==== Bestanden wissen
+
+Bestanden verwijderen van een harde schijf is soms minder eenvoudig dan het lijkt. Indien de bits herschreven worden, zijn er technologisch nog mogelijkheden die toelaten om na te gaan wat vorige waarden waren. Hier gaan we niet op die technieken in. Het is ook interessant om te weten wat er op een bestandsysteem gebeurt wanneer een bestand gewist wordt. Aan de snelheid waarmee een grote hoeveelheid of grote bestanden gewist worden kan je al merken dat niet elk byte op de schijf gewist wordt. In plaats daarvan zal de verwijzing in het bestandsysteem worden aangepast. +
+In het geval van FAT16 wordt een speciaal karakter gebruikt om de naam in de root folder mee te beginnen en worden alle clusters die gebruikt werden, in de FAT tabel als ongebruikt gemarkeerd. +
+Het is in dit geval nog mogelijk om het bestand terug te vinden, op voorwaarde dat het niet gefragmenteerd was. In geval van fragmentatie is de (gewiste) FAT tabel nodig om de juiste clusters en hun volgorde terug te vinden. +
+Bij NTFS wordt enkel het MFT record aangepast, waarin een parameter zal aangeven dat het bestand gewist is. Aangezien dit anders gemarkeerde, maar niet gewiste MFT record nog steeds alle informatie bevat (via de runlist) is het nu mogelijk om ook gefragmenteerde gewiste bestanden terug te vinden. Belangrijke voorwaarde is wel dat de vrijgekomen ruimte nog niet beschreven mag zijn voor een ander bestand (en uiteraard mag het MFT record ook nog niet overschreven zijn).
+
+Bedenk zelf of data nog terug te vinden is als je een schijf formatteert. Bij het formatteren worden de nodige controlestructuren (PBS, FATs/MFT, ...) aangebracht en worden alle preambules van de sectoren vastgelegd.
+
+===	Snelheid bij disks: IOPS
+Zie bijkomend lesmateriaal op Toledo
+
+===	Opslagmedia combineren: RAID
+
+====	Types
+=====	RAID0
+
+Zie slides op Toledo
+
+=====	RAID1
+
+Zie slides op Toledo
+
+=====	RAID10
+
+Zie slides op Toledo
+
+=====	RAID5
+
+Zie slides op Toledo
+
+====	Gecombineerde snelheid
+
+Zie slides op Toledo
+
+=== Bronvermelding bij dit hoofdstuk
+[Bibliography]
+- [[[MANGAN]]] 'Advanced format 4K disk drives and performance'. Tim Mangan, http://www.brianmadden.com/blogs/timmangan/archive/2010/08/16/advanced-format-4k-disk-drives-and-performance.aspx
+- [[[PCPART]]] 'storage trends'. https://pcpartpicker.com/trends/internal-hard-drive/ . accessed 27/08/2014
+- [[[ANAND2]] 'The SSD Anthology: understanding SSDs and new drives from OCZ'. Anand Lal Shimpi, http://www.anandtech.com/show/2738

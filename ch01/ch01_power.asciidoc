@@ -1,0 +1,237 @@
+
+== Computervoeding
+
+=== Principe en werking 
+
+
+
+Een computer, of het nu een PC, laptop, server of smartphone is, kan enkel functioneren als de juiste elektrische spanningen aangebracht worden. Elektronische componenten vragen een relatief lage, maar erg stabiele gelijkspanning om te functioneren. 
+Deze wordt geleverd door een voeding, die de wisselspanning van het elektriciteitsnet omzet naar de nodige gelijkspanningsniveaus. De techniek die hierbij gebruikt wordt noemt men *switched mode power supply* of *schakelende voeding*. 
+Het schema van de omzetting wordt weergegeven in onderstaande afbeelding
+
+
+.Principe schakelende voeding
+image::ch01/images/principe_geschakelde_voeding.png[alt="psu principe", align="center", scaledwidth="100"]
+
+Een eerste stap ① is de *gelijkrichter* aan de ingang, waarmee de wisselspanning wordt omgezet naar een gelijkspanning. Deze gelijkspanning wordt vervolgens gefilterd, zodat de variatie in het spanningsniveau beperkt wordt.
+De tweede stap ② is een stuk minder voor de hand liggend. Op basis van de gelijkgerichte en gefilterde ingangsspanning zal een +invertor+ een blokgolf genereren. Deze wisselspanning wordt bekomen door het aan- en afschakelen van de ingangsspanning. 
+Eigenlijk is de combinatie van de eerste twee stappen samen te vatten als een frequentieomvormer. Het ingangssignaal wordt omgezet naar een hoger-frequent signaal (van 50Hz naar frequenties boven 20kHz). 
+
+Het voordeel van deze omzetting is dat de *transformator* in de volgende stap een stuk kleiner en efficiënter kan zijn. Deze gelijkrichter en transformator ③ brengt de spanning naar het gewenste niveau, waarna het met de uitgangs-gelijkrichter en filter ④ wordt omgezet naar een stabiele gelijkspanning.
+Een bijkomend voordeel van de omzetting is dat het menselijk gehoor signalen boven 20kHz niet kan waarnemen, zo hebben we dus geen last van het geluid dat de voeding kan voortbrengen.
+
+In de figuur is ook te zien dat de uitgangsspanning teruggekoppeld wordt ⑤ naar de invertor. Op die manier kan de uitgangsspanning nog geregeld worden. De invertor-stap heeft immers ook invloed op de amplitude van zijn uitgang. Deze *terugkoppeling* gebeurt meestal met optocouplers om een galvanische scheiding te bekomen.
+
+[NOTE]
+Om het verbruik van een CPU uit te drukken, wordt vaak gesproken over *TDP* (Thermal Design Power). Dat is een waarde die aanduidt hoeveel energie de CPU maximaal dissipeert onder een zware, maar realistische belasting gedurende een bepaalde tijd. Echter dient opgemerkt te worden dat 'AMD' en 'Intel' hiervoor verschillende berekeningsmethodes gebruiken.  De TDP geeft dus een indicatie over het maximale verbruik, maar gedetailleerde benchmarks blijven nodig om exacte waarden te kennen. footnote:[meer uitleg over de berekening van TDP bij Intel vind je in http://www.intel.com/content/www/us/en/benchmarks/resources-xeon-measuring-processor-power-paper.html[deze whitepaper] ]
+
+=== Eigenschappen
+
+==== Vormfactor en connectoren
+
+De eerste (IBM) PC beschikte over een moederbord met AT vormfactor, de bijhorende voeding was dan ook een AT voeding. In 1995 kwam er een opvolger, met name de ATX vormfactor. Ondertussen is deze specificatie ook geëvolueerd (ondertussen ATX 2.3). 
+
+De belangrijkste verschillen situeren zich op het vlak van de spanningen die de voeding kan afgeven en de connectoren die voorzien zijn op de voeding. 
+
+In het bijzonder is er natuurlijk een verschil tussen de verschillende connectoren die op het moederbord worden aangesloten. Een AT voeding bood een connector van tweemaal zes aansluitingen, een ATX voeding biedt daarentegen een connector met 24 aansluitingen. (in de oorspronkelijke versie was dit 20, tegenwoordig is er ook steeds een vierpolige connector die twee keer twaalf Volt levert aan de processor.)
+
+.ATX 2.0 moederbord connector (CC Wikimedia commons) 
+//http://en.wikipedia.org/wiki/File:ATX_PS_signals.svg#globalusage
+image::ch01/images/1000px-ATX_PS_signals.svg.png[width="300", alt="ATX 2.0", align="center", scaledwidth="20"]
+
+
+Een belangrijk verschil tussen beiden is de aanwezigheid bij ATX van een 3.3V spanning, een +5V standby en power on signaal. 
+Deze laatste twee maken het mogelijk dat de mechanische schakelaar van de AT voeding (die rechtstreeks de voeding aanstuurde), vervangen kon worden door een elektronisch signaal van het moederbord naar de voeding. In eerste instantie kan het moederbord dit signaal sturen als het zelf een input krijgt van een drukknop. Er zijn echter ook alternatieven mogelijk, zoals wake-on-lan, speciale toetsen op een toetsenbord,... 
+
+Hieruit kan je afleiden dat bij een computer die uitgeschakeld is, een deel van het moederbord nog steeds onder spanning staat. 
+Deze spanning kan je alleen wegnemen door de voeding uit te schakelen (schakelaar op voeding, stekker uittrekken). 
+
+Naast de verschillen in connectoren die op het moederbord worden aangesloten, is er ook onderscheid op het vlak van de andere connectoren. Afhankelijk van de andere apparaten (en hun voedingsaansluiting), moet je erop letten om een voeding te kiezen die de nodige connectoren aanbiedt. 
+
+Enkele belangrijke connectoren zijn: 
+
+* ATX power connector (ook wel moederbord connector genoemd)
+* 4-pin connector (molex): o.a. voor (ATA) schijven, optische drives
+* SATA voedingsconnector 
+* Auxiliary connectors: verschillende varianten van extra voedingsconnector en om extra vermogen te leveren 
+
+==== Vermogen
+Een erg belangrijke eigenschap voor een voeding is het vermogen dat ze kan leveren. 
+Uiteraard moet dit te leveren vermogen voldoende zijn om alle componenten in het systeem te voorzien van stroom. Het vergelijken van voedingen op dit vlak is iets complexer dan kijken naar de waarden die de fabrikant op zijn verpakking adverteert. 
+
+Belangrijker dan het getal is de betekenis ervan. Aangezien er geen voorschriften zijn voor de bepaling van die vermogenswaarde, kan 500W bij de ene fabrikant betekenen dat de voeding 500W piekvermogen kan leveren bij 10°C en bij een andere een continu vermogen van 500W bij 40°C.
+Als het systeem continu 450W nodig heeft, zou de eerste voeding kunnen falen. 
+
+Een tweede belangrijke opmerking is dat niet alleen het totale vermogen belangrijk is, maar ook het vermogen dat op elke voedingsspanning apart geleverd kan worden. Het is duidelijk dat een computervoeding meerdere eindtrappen moet bevatten voor de verschillende spanningen. Op elk van deze rails is er een maximale stroom die geleverd kan worden. 
+
+Als de maximale stroom op de 12V rail 5A is, kan je met een 500W voeding niet voorzien in de behoeften van een computer die een vermogen van 200W nodig heeft, maar wel 6A op de 12V rail. Dit kan een belangrijke reden voor prijsverschillen in voedingen zijn. Goedkopere voedingen kunnen typisch meer stroom leveren bij de lagere spanningen en minder bij 12V. Er moet nog worden opgemerkt dat sommige voedingen verschillende rails hebben voor eenzelfde voedingsspanning. Op elk van deze rails is dan een maximale stroom vastgelegd. Het zal wel duidelijk zijn dat je dan best de verbruikers op een zo evenwichtig mogelijke manier over deze rails moet verdelen. 
+
+Een laatste opmerking is dat het vermogen van de voeding zo goed mogelijk op het systeem moet worden afgestemd. Uiteraard betekent dit dat je voldoende piekvermogen nodig hebt, maar zomaar een voeding van 1kW aanschaffen voor een systeem dat 200W nodig heeft is niet meteen een goede keuze. 
+
+====	Rendement
+Het ‘groene’ aspect bij computers komt steeds meer naar voor. Het rendement van de voeding is daarbij een belangrijke factor. Je wil natuurlijk voor elke 100 Watt die je uit het stroomnet haalt, ook 100W prestaties zien. Helaas is dit niet mogelijk: voedingen hebben een rendement dat een stuk lager ligt dan de ideale 100%. Dat verlies uit zich voornamelijk in warmte, die dan weer moet afgevoerd worden. Het spreekt voor zich dan een hoger rendement meestal ook een iets hoger prijskaartje met zich zal meebrengen. Toch is dit het overwegen waard als je een kleine rekenoefening maakt.
+
+====	Geluid
+De geluidsproductie van een computer is in verschillende gebruiksomgevingen liefst zo klein mogelijk. Een belangrijke bron van lawaai wordt gevormd door de verschillende koelingen en in het bijzonder de ventilatoren die hierbij worden gebruikt. Hier blijkt alvast het belang van het rendement van een voeding. Hoe hoger het rendement, des te minder verlies er is. Dit verlies manifesteert zich steeds onder de vorm van warmte. 
+
+Naast het rendement is ook de grootte van de ventilator belangrijk. Een grotere ventilator zal bij lagere toerentallen voldoende kunnen koelen en daarbij minder lawaai produceren. Er bestaan ook voedingen die volledig passief (zonder ventilatoren) gekoeld worden. Deze produceren uiteraard geen lawaai, maar zijn typisch iets duurder.
+
+.rekenvoorbeeld stroomverbruik
+[example]
+====
+Een computer (inclusief scherm) die niet erg zwaar belast wordt, verbruikt ongeveer 200 Watt. Als je deze pc elke werkdag 10 uur gebruikt, dan komt het verbruik op 
+
+0,150 kW x 10 uur per dag x 250 werkdagen= 375 kWh per jaar
+
+Als je daar de prijs tegenover zet die een gemiddeld gezin (bron: VREG, oktober 2012) betaalt per kWh, dan kost deze pc je 375 * 0,2€ = € 75. Een voeding met een rendement dat 20% beter is zal je dus op jaarbasis makkelijk 15 Euro opleveren. 
+
+Het loont dus de moeite om bij de aankoop de voeding zorgvuldig te kiezen. De meerprijs voor een duurdere PSU (Power Supply Unit) kan dus zeker renderen. In een bedrijf met honderden desktops begrijp je dat dit een verkoopsargument kan zijn. 
+====
+
+*Het 80-plus certificatieprogramma* probeert voor de consument duidelijkheid te scheppen door voedingen een label te geven naargelang de efficiëntie. De certificatie is echter geen verplichting voor fabrikanten.
+
+.80 plus certificatie (bron: http://en.wikipedia.org/wiki/80_Plus[Wikipedia] )
+[cols="7*",options="header"]
+|=====================
+|			|standaard		|brons      	|zilver 		| goud 			| platinum | titanium footnote:[bij titanium worden ook nog extra eisen gesteld]
+
+|20% belast |>=80%    		|>=82%     		|>=85%			| >=87%			| >=90% 	| >=94%
+
+|50% belast |>=80%    		|>=85%     		|>=88%			| >=90%			| >=92%		|>=96%	
+
+|100% belast |>=80%    		|>=82%     		|>=85%			| >=87%			| >=89%		|>=94%
+|=====================
+
+Laptops hebben een verbruik dat typisch een flink stuk lager zit. Hoewel ze een voeding hebben die meestal een behoorlijk hoog wattage aankan om de accu snel op te laden, is het gemiddeld verbruik meestal slechts rond de 30Watt. 
+Nieuwere toestellen die een hoge autonomie tot hun belangrijkste verkoopargumenten rekenen, zoals chromebooks, kunnen zelfs onder maximale belasting onder de grens van 15 Watt blijven. <<ANAND>>
+
+Het matige rendement van PSU’s is voor een deel eigen aan de opbouw ervan. Omdat veel verschillende eindtrappen nodig zijn voor de verschillende spanningen, is het totale rendementsverlies een accumulatie van de kleinere verliezen bij de deeltrappen. 
+
+Ondertussen verlaten sommige grote spelers om die reden de ATX standaard om met eigen oplossingen hogere rendementen te behalen. Google ontwikkelt bijvoorbeeld z’n eigen servervoedingen die door hun eenvoud een veel hoger rendement halen. De eenvoud bestaat erin dat ze slechts 1 spanning aanbieden aan het moederbord: 12V. Als componenten een andere voedingsspanning vereisen,  worden die waar nodig getransformeerd op het moederbord, wat veel efficiënter kan. Google research publiceerde een paper <<GOOGLE>> die schat dat de energiebesparing die je hiermee kan behalen op een populatie van 100 miljoen computers 13 miljard kWh betreft op jaarbasis. Dat komt, om je een idee te geven, ongeveer overeen met de opbrengst van de helft van een kerncentrale zoals die in Doel (jaarproductie 22 miljard kWh).
+
+====	Problemen met voedingen
+
+Problemen met voedingen hebben altijd gevolgen voor het volledige systeem, aangezien ze dit volledige systeem van stroom moeten voorzien. Een belangrijke oorzaak van problemen is een te klein vermogen voor het systeem of onvoldoende koeling. Dit probleem uit zich meestal niet in het niet opstarten van het systeem, maar eerder in het onverwacht afsluiten (of eventueel herstarten) ervan. Dit is dan nog het meest aangename gevolg van het probleem. Het is belangrijk om bij dergelijke problemen de voeding en de koeling ervan te controleren. 
+
+Minder aangename gevolgen kunnen zijn dat de voeding beschadigd raakt en in het meer dramatische geval dat er rook uit de computerkast komt. Deze kan dan afkomstig zijn van de voeding zelf, maar ook van andere componenten(moederbord, RAM, CPU). Een situatie die de meesten liever vermijden. 
+
+Een voeding kan ook slijtage vertonen. In het bijzonder op het vlak van de elektrolytische condensatoren kan er veel verschil zijn tussen voedingen. Minder kwalitatieve condensatoren kunnen uitdrogen (elektrolyt dat verdampt), waardoor ze hun functie minder tot niet meer vervullen en de voeding uiteindelijk rook in plaats van gelijkspanning produceert. Dit gebeurt uiteraard pas na verloop van tijd (afhankelijk van de belasting van de computer).
+
+Sommige voedingen hebben een controlesysteem dat je door middel van geluidssignalen preventief waarschuwt als er problemen dreigen, zoals overbelasting of een gebrekkige koeling.
+
+===	Accu’s
+
+Tegenwoordig kunnen we het niet meer hebben over computervoedingen zonder even uit te wijden over accu’s. In de trend naar mobiliteit (laptops, tablets, smartphones), vormen die een onmisbare schakel. 
+
+
+====	Eigenschappen
+=====	Capaciteit
+
+De capaciteit van batterijen wordt meestal uitgedrukt in Ah (ampère/uur) of mAh (milliampère/uur). Met die eenheid kan je makkelijk accu-packs vergelijken. Een batterij van 6Ah zal theoretisch bijvoorbeeld in staat zijn om gedurende 6 uur een stroom af te leveren van 1 Ampère, of gedurende bijvoorbeeld 2 uur een stroom van 3 Ampère. Uiteraard zijn er in realiteit door de fabrikant maxima gedefinieerd zodat de levensduur van de accu niet bedreigd wordt.
+
+Sommige fabrikanten verkiezen echter om hun capaciteiten uit te drukken in Wh, wat vergelijken lastiger kan maken. Toch kan je eenvoudig omrekenen bij gelijkstroom:
+Je weet immers dat 
+
+[latexmath]
+++++
+P=U*I (Vermogen = Spanning x Stroom)
+++++
+
+Willen we dus de stroom I(A) kennen, dan moeten we het vermogen delen door de spanning.
+Nemen we onderstaand voorbeeld:
+ 
+.accu 
+image::ch01/images/Battery_Capacity_Conversion.JPG[alt="accus", align="center", scaledwidth="50"]
+
+We kunnen hier dus de capaciteit in Ah bepalen door 
+
+[latexmath]
+++++
+I_h = P_h/U = 2,4Wh/3,6V = 0,666Ah (of 666mAh)
+++++
+
+=====	Aantal cellen
+
+Een accu wordt opgebouwd uit verschillende cellen. Bijvoorbeeld bij Li-ion accu’s kunnen die elk ongeveer 3V leveren. Het spreekt voor zich dat een toename van het aantal cellen zal betekenen dat de totale capaciteit ook toeneemt.
+
+.Oefening
+====
+Wat is de capaciteit van je eigen laptopaccu? 
+
+Stel dat je deze accu gebruikt om een lamp (bijvoorbeeld een powerLED) te doen branden die 5 Watt verbruikt. Hoe lang zal de lamp branden?
+
+Uit hoeveel cellen bestaat je accu-pack?
+====
+
+=====	Laadcurve
+
+Om de optimale kwaliteit van de accu te garanderen over langere termijn is het nodig om de juiste laadcurve te respecteren. Een batterij zal uiteraard stroom nodig hebben om zich op te laden, maar het is niet noodzakelijk zo dat een hogere stroom zal betekenen dat de batterij sneller oplaadt. Het gebruik van de juiste en kwalitatieve adapter is hierbij erg belangrijk.
+
+=====	Memory-effect
+Het zogenaamd memory-effect is een term die vaak gebruikt wordt om aan te geven dat bepaalde types batterijen, met NiCd (Nikkel-Cadmium) op kop, vaak een effect vertonen waarbij het lijkt dat de batterijen snel hun capaciteit verliezen als je ze halverwege de ontlaadcyclus terug oplaadt. Dat fenomeen is eigenlijk de verzamelnaam van effecten die worden veroorzaakt door een combinatie van elektrische en chemische processen.
+
+=====	Li-ion accu’s
+Tegenwoordig is dit zowat het meest voorkomende type in hoogwaardige mobiele apparatuur. Dit type onderscheidt zich door een erg hoge energiedichtheid, en het ‘memory-effect’ is niet bestaande. 
+ 
+.werking van Li-Ion accu
+video::2PjyJhe7Q1g[youtube,width="500",height="500",align="center"]
+
+Toch zijn er enkele belangrijke eigenschappen aan dit type, die je beter kent..
+Het zwakke punt van Li-Ion: degradatie
+
+Wie een laptop of gsm gebruikt, kent het fenomeen: na enkele jaren is de capaciteit van de batterij slechts nog een fractie van wat ze was bij aankoop. Dit fenomeen kan je niet omkeren, maar het kan wel vertraagd worden als je weet wat de factoren zijn die dit proces versnellen...
+
+Een Li-ion-accu verliest zijn capaciteit het snelst als hij zich in een warme ruimte bevindt, en opgeladen is. Een volledig opgeladen Li-ion accu zal bijvoorbeeld na een jaar rusten in een ruimte waar het gemiddeld 20°C is, 20 procent van zijn capaciteit verliezen. 
+
+Is diezelfde accu slechts half opgeladen, dan zal de capaciteit met slechts enkele procenten dalen. Het is dus niet verstandig een Li-ion-accu voor lange tijd weg te bergen in opgeladen toestand. Ook door stockage in koele ruimtes kan de capaciteit langer bewaard blijven. Een laptop die snel erg warm wordt bij gebruik zal dus meteen ook nefast zijn voor de capaciteit van de batterij op langere termijn. +
+Bij een temperatuur van iets boven het vriespunt en een lading van ongeveer 40% zal dit type batterij de langste levensduur ‘on the shelf’ hebben.
+
+=====	Toekomstige ontwikkelingen
+Gezien de enorme markt die ontstaan is voor accu’s, is er enorm veel druk om betere modellen te ontwikkelen. Daarbij worden bestaande types geperfectioneerd, maar ook nieuwe types ontwikkeld. 
+Zo zijn er de *LiPo* (Lithium polymeer) batterijen die ongeveer 50% efficiënter zijn dan klassieke Li-Ion equivalenten, en ook de brandstofcellen (fuel cells) die mogelijks een oplossing kunnen vormen voor de steeds grotere autonomie-behoefte van toestellen. Omdat veel van deze technieken gebruik maken van erg zeldzame delfstoffen, komen ook geavanceerde technieken met courante materialen in het vizier ter optimalisatie of vervanging, zoals nanostructuren met koolstof. Deze blijven echter toekomstmuziek voor consumentenelektronica…
+
+===	Uninterruptible Power Supply (UPS)
+Een UPS is een toestel dat het wegvallen van de netspanning kan opvangen. Hiervoor bestaat een UPS uit een accu en een elektronische schakeling die de accuspanning kan omzetten naar een netspanning. 
+
+.Rack-mountable UPS (bron: http://www.apc.com[www.apc.com])
+image::ch01/images/ups/apc_ups.jpg[alt="APC UPS", align="center", scaledwidth="20", width="300"]
+ 
+Bij het wegvallen van de netspanning zal de UPS ogenblikkelijk de stroomvoorziening overnemen. 
+Voor de aangesloten toestellen treedt er dus geen onderbreking op. Een UPS kan de stroom natuurlijk niet onbeperkt in de tijd overnemen. Hoe lang de UPS dit kan volhouden, hangt af van de accu’s en het gevraagde vermogen. Om te vermijden dat apparatuur plotseling en ongecontroleerd stilvalt, heeft een UPS dikwijls ook een interface naar de computer. Deze laat toe dat de UPS de computer ‘proper’ afsluit op het ogenblik dat de accu-stroom een bepaalde ondergrens bereikt. Een alternatief kan erin bestaan dat de UPS gecombineerd wordt met een dieselgenerator. 
+
+De UPS zorgt dan voor de ogenblikkelijke overname van de stroomvoorziening en geeft de generator de nodige tijd om op te starten. Zodra de generator actief is (en de uitgangsspanning gestabiliseerd is), neemt deze de stroomvoorziening op zich.
+
+Een UPS heeft meestal ook een spanningsbeveiliging aan boord die je apparatuur kan beschermen tegen storingen op het elektriciteitsnet.
+UPS’en vind je in alle prijsklassen, wat vaak te maken heeft met de inwendige opbouw ervan. Er onderscheiden zich enkele grote types.
+
+In onderstaand beschrijvend videootje worden enkele details over de werking toegelicht.
+
+video::E5RKBWhEUAU[youtube, align="center", width="640", height="480"]
+
+Een noodstroominstallatie die zonder onderbreking te veroorzaken de netspanning kan overnemen wordt een *nobreak* installatie genoemd. <<WIKINOBREAK>> Hiervoor wordt een combinatie van een UPS en een noodstroomaggregaat (generator die op diesel werkt) gebruikt. De UPS levert spanning tijdens de eerste minuten, hierna neemt de noodstroomaggregaat het over, en dan laadt de UPS weer op.
+
+====	Online UPS
+De online UPS wordt ook wel “double conversion” UPS genoemd. Alle stroom die naar de IT-apparatuur gaat, loopt door de UPS. Hierdoor is het niet nodig om over te schakelen bij het uitvallen van de stroom. Met de bypass kan je evenwel de ups overbruggen. Dat kan bijvoorbeeld interessant zijn als er onderhoud nodig is. Omdat hierdoor veel gevraagd wordt van alle elektronica (die constant volledig belast wordt), is dit een relatief duur concept.
+ 
+.Online UPS ( (C) GFDL Joslee 2007 )
+image::ch01/images/ups/Double_conversion_UPSII.png[alt="APC UPS", align="center", scaledwidth="50"]
+
+==== Offline UPS 
+Dit type UPS vind je voornamelijk terug bij particuliere ups’en waar kostprijs een belangrijk criterium is. Bij het wegvallen van de spanning, wordt een bypass ingeschakeld. Die procedure duurt enkele milliseconden waarbij je geen uitgangsspanning hebt, en dat moet opgevangen worden door de voeding van je computer of server. Een nadeel van dit type UPS is dat je hem ook niet zonder risico kan testen. 
+
+Een ander nadeel is dat in gewone omstandigheden de netspanning rechtstreeks gekoppeld is aan je IT-apparatuur. Als er storingen op het net zitten, zal je IT apparatuur daar hinder van ondervinden. De apparatuur is dus niet beveiligd.
+ 
+.Offline UPS ( (C) Joslee 2007 GFDL)
+image::ch01/images/ups/Off_line_ups.png[alt="offline UPS", align="center", scaledwidth="50"]
+
+==== Line-interactive UPS
+Deze vorm van UPS vormt een hybride oplossing. In feite gaat het om een off-line UPS waar de line-feed voorzien is van aanvullende filters. Zo ben je zeker dat de spanning die aan je servers aangelegd is, gezuiverd werd van pieken en storingen. In omgevingen waar veel storing optreedt is dat geen overbodige luxe. (bijvoorbeeld fabriekshallen, gebieden met gebrekkige stroomvoorziening)
+ 
+.Line interactive UPS ( (C) Joslee 2007 GFDL)
+image::ch01/images/ups/Line_interactive_UPSII.png[alt="line interactive UPS", align="center", scaledwidth="50"]
+
+=== Bibliografie bij dit hoofdstuk
+[bibliography]
+- [[[GOOGLE]]] Google. High efficient power supplies for home computers and servers. 2006.  http://static.googleusercontent.com/media/services.google.com/nl//blog_resources/PSU_white_paper.pdf  
+- [[[ANAND]]] AnandTech. Samsung Chromebook Review. http://www.anandtech.com/show/6422/samsung-chromebook-xe303-review-testing-arms-cortex-a15/7
+- [[[WIKINOBREAK]]] Bron Wikipedia. Noodstroomvoeding Wikipedia. [online] 2014. [Cited: 21/7/2014]

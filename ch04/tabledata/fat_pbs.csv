@@ -1,0 +1,30 @@
+Offset, beschrijving,grootte
+00h,Jump Code + NOP,3 Bytes
+03h,OEM Name (Probably MSWIN4.1),8 Bytes
+0Bh,Bytes Per Sector,1 Word
+0Dh,Sectors Per Cluster,1 Byte
+0Eh,Reserved Sectors,1 Word
+10h,Number of Copies of FAT,1 Byte
+11h,Maximum Root DirectoryEntries (N/A for FAT32),1 Word
+13h,Number of Sectors inPartition Smaller than 32MB (N/A for FAT32),1 Word
+15h,Media Descriptor (F8h forHard Disks),1 Byte
+16h,Sectors Per FAT in Older FATSystems (N/A for FAT32),1 Word
+18h,Sectors Per Track,1 Word
+1Ah,Number of Heads,1 Word
+1Ch,Number of Hidden Sectors inPartition,1 Double Word
+20h,Number of Sectors inPartition,1 Double Word
+24h,Number of Sectors Per FAT,1 Double Word
+28h,Flags ,1 Word
+2Ah,"Version of FAT32 Drive (HighByte = Major Version, Low Byte = Minor Version)",1 Word
+2Ch,Cluster Number of the Startof the Root Directory,1 Double Word
+30h,Sector Number of the FileSystem Information Sector (See Structure Below)(Referenced from the Start of the Partition),1 Word
+32h,Sector Number of the BackupBoot Sector (Referenced from the Start of the Partition),1 Word
+34h,Reserved,12 Bytes
+40h,Logical Drive Number ofPartition,1 Byte
+41h,Unused (Could be High Byteof Previous Entry),1 Byte
+42h,Extended Signature (29h),1 Byte
+43h,Serial Number of Partition,1 Double Word
+47h,Volume Name of Partition,11 Bytes
+52h,FAT Name (FAT32),8 Bytes
+5Ah,Executable Code,420 Bytes
+1FEh,Boot Record Signature (55hAAh),2 Bytes

@@ -1,0 +1,26 @@
+= Computerarchitectuur
+Roel Van Steenberghe <roel.vansteenberge@gmail.com>
+
+:icons: font
+:toc: left
+:numbered: 
+:doctype: book
+:stem: latexmath
+
+
+:source-highlighter: pygments
+
+:toc:
+include::ch00_dedication.asciidoc[]
+include::ch00_preface.asciidoc[]
+include::ch01/ch01_power.asciidoc[]
+include::ch02/ch02_CPU.asciidoc[]
+include::ch03/ch03_memory.asciidoc[]
+include::ch04/ch04_storage.asciidoc[]
+include::ch05/ch05_boot.asciidoc[]
+include::ch06/ch06_internalIO.asciidoc[]
+include::ch07/ch07_externalIO.asciidoc[]
+include::bibliography.asciidoc[]
+
+
+

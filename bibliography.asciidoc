@@ -1,0 +1,8 @@
+== Literatuurlijst
+
+Onderstaande werken bevatten een stuk diepgaandere informatie over deze materie. Ze kunnen dan ook een ideaal vertrekpunt vormen voor een verdere studie van de computerarchitectuur.
+
+[bibliography]
+- [[[STALLINGS]]] Andy Hunt & Dave Thomas. 'Computer Organization and architecture, Ninth edition'. Pearson education. 2012.
+- [[[RAMA]]] Umakishura Ramachandran. 'Computer Systems: An Integrated Approach to Architecture and Operating Systems'. Manning Publications.
+  2010.

@@ -1,0 +1,238 @@
+== Externe I/O
+
+In dit hoofdstuk komen een aantal veel voorkomende interfaces voor randapparatuur voor. Een aantal hiervan worden uitgebreider besproken in de cursus “interfacing & microcontrollers”.
+
+===	In den beginne 
+
+Dit hoofdstuk heeft niet de pretentie om alle mogelijke interfacebussen op te lijsten. Een aantal van die bussen worden niet meer gebruikt of raken stilaan in onbruik. +
+De klassieke printerpoort of Centronics-poort is er zo eentje. Deze parallelle poort zoals ze ook genoemd werd, is primair ontworpen voor het aansturen van printers. Getuige daarvan zijn de specifieke controlelijnen om aan te geven als bijvoorbeeld het papier uitgeput is. Deze poort werd later ook nog veelvuldig gebruikt, omdat ze erg eenvoudig is van opbouw, en daardoor makkelijk te gebruiken voor kleinere elektronicaprojectjes. Tegenwoordig is deze poort slechts zelden nog te vinden op een pc. +
+Ook de seriële poort is stilaan in z’n bestaan bedreigd. Enkel voor heel specifieke toepassingen (vb configuratie van apparatuur als routers) wordt ze nog gebruikt, maar ook daar moet ze stilaan plaats ruimen voor USB. 
+
+De COM-poort (zoals de seriële poort ook genoemd werd) laat asynchrone seriële communicatie toe. Dit betekent relatief lage bitsnelheden (minimum 50bps, standaard 9600bps, maximum115kbps).
+Deze vorm van communicatie wordt gebruikt voor tragere I/O, zoals barcodescanners, modems, ... +
+Omwille van de eenvoud en de ondersteuning op tal van microcontrollers wordt ze dikwijls gebruikt bij embedded systemen. +
+ 
+Firewire is een andere I/O mogelijkheid die vooral door Apple gepromoot werd, maar die stilaan in onbruik geraakt is.
+
+===	PS/2
+
+image::ch07/images/ps2port.jpg[alt="ps/2 connector",scaledwidth="40", width="400",align="center"]
+
+De PS/2 interface duikt in de PC wereld op met de introductie van de IBM PS/2 (Personal System 2), ondertussen enkele decennia geleden. Het is een interface die dient voor het aansluiten van toetsenborden en muizen. Er bestaan twee connectoren die identiek zijn, op hun kleur na. De paarse connector dient voor een toetsenbord, de groene voor een muis. Aangezien beiden gebruik maken van een ander protocol is het aangewezen om de kleurcode te respecteren. Met name het BIOS kan problemen maken van een toetsenbord dat op de verkeerde poort is aangesloten, zodat bij het opstarten geen opdrachten doorgegeven kunnen worden via het toetsenbord. Een tweede mogelijk verrassend feit, is dat PS/2 niet hot pluggable is. + 
+Dit komt door het elektronisch ontwerp. De pinnen van de connector zijn rechtstreeks verbonden met de pinnen van de microcontroller die beschadigd kan worden door hot swapping. Anderzijds is er ook geen ondersteuning voor het herkennen van een nieuw aangesloten apparaat. In moderne interfaces worden de contacten naar de microcontroller robuuster uitgevoerd, zodat er minder kans op beschadiging is. Bij het gebruik van standaardapparaten is de herkenning van het nieuw aangesloten apparaat ook geen probleem, zodat hot swapping soms wel succesvol kan aflopen, maar absoluut niet aan te raden is. +
+
+PS/2 is ondertussen technologisch al lang achterhaald, maar blijft desondanks (backward compatibility) toch aanwezig aan de achterkant van vele PC’s en servers. De opvolger van PS/2 is USB, dat tevens een aantal andere interfaces moet vervangen, met als belangrijke pluspunt een uniforme aansluiting voor alle soorten apparaten.
+
+===	USB
+====	Overzicht
+
+Om een oplossing te vinden voor de problemen bij het gebruik en vooral de configuratie van de klassieke (legacy) I/O-interfaces zoals de Centronics Interface en RS232, werd onder andere onder impuls van Intel een werkgroep opgericht met als doel het ontwikkelen van een nieuwe interface standaard. Dit werd de Universal Serial Bus (USB). USB is een snelle en flexibele interface om randapparatuur te verbinden met een computer. Ze is ontworpen met als doel het gebruiksgemak en betrouwbaarheid te verhogen.
+
+Doelstellingen: 
+
+*	eenvoudige en betrouwbare aansluiting geschikt voor alle soorten randapparatuur 
+*	immuun voor problemen met systeemresources als interrupt- of DMA-conflict 
+*	automatische detectie en configuratie van aangesloten apparaten 
+*	goedkoop te realiseren 
+*	laag stroomverbruik 
+*	hot-pluggable
+
+In de originele specificatie (USB 1.1) is er sprake van twee mogelijke transmissiesnelheden:
+
+*	*Low Speed*: 1,5 Mbps, bedoeld voor I/O met een beperkt datadebiet: muis, toetsenbord, joystick, ...
+*	*Full Speed*: 12 Mbps, bedoeld voor hogere debieten: audio, printers, scanners, processorcommunicatie...
+	In een latere revisie (USB 2.0) is er een derde mogelijkheid bijgekomen:
+*	*High Speed*: 480 Mbps, bedoeld voor video, externe harde schijven, DVD of CD-romspelers, ...
+	De nieuwste revisie (USB 3.0) krikt de snelheid verder op:
+*	*Superspeed*: 4,8 Gbps, bedoeld om extra hoge snelheden te halen, zoals voor SSD. 	De nieuwe mogelijkheden van deze versie van de standaard komen op het eind van 		dit hoofdstuk aan bod.
+	De USB-bus is gebaseerd op het master/slave principe: de host (de computer) is verantwoordelijk voor het beheer en de coördinatie van de activiteit op de bus. Er kan dus enkel communicatie gebeuren op initiatief van de host. Deze bevat hiervoor een zogenaamde USB Host-controller.
+
+====	Mechanische en elektrische opbouw
+
+De USB-bus werkt met relatief korte kabels (maximum 5 m.) voor punt tot punt verbindingen: er wordt telkens een apparaat verbonden met een poort van een USB-hub. Ook de aansluitingen op een computer maken deel uit van één of (soms) meerdere hubs. Een USB2-kabel bevat vier geleiders: 
+
+*	Rood: +5V 
+*	Zwart: Gnd 
+*	Wit: Data 
+*	Groen: Data+ 
+
+In het geval van Full- of High Speed USB heeft het datapaar een afzonderlijke afscherming. Om grotere afstanden te overbruggen of meer apparaten aan te sluiten kan de installatie uitgebreid worden door gebruik te maken van externe USB-Hubs. In totaal mogen er maximaal 4 externe hubs achter elkaar geschakeld worden (geeft een maximum afstand van 30 m) en mogen er maximaal 127 apparaten aangesloten worden op een USB-bus. Er zijn twee types connectoren. Type A wordt gebruikt voor de aansluiting aan de hub (of op de computer). Type B wordt gebruikt voor de aansluiting. +
+Er bestaan ook mini en micro varianten van de connectoren. Volgende figuur toont een aantal voorbeelden.
+
+image::ch07/images/2000px-Types-usb_th1.svg.png[alt="USB connectoren (bron: wikipedia)",align="center",scaledwith="30"]
+
+Als een randapparaat geen al te groot stroomverbruik heeft, kan het gevoed worden vanuit de USB-kabel: stromen tot 500 mA zijn toegestaan bij een spanning van 5V (vanwege spanningsverlies over de kabel kan deze spanning zakken tot minimaal 4 V bij het randapparaat). Voor grotere vermogens moet het randapparaat een eigen voeding voorzien. 
+
+De USB-bus verstuurt de data serieel met NRZI-codering (Non Return on Zero Inverted) via een differentieel signaal (D+, D-). Een overgang in het datasignaal stelt een 0 voor, terwijl een ongewijzigd signaal een 1 voorstelt. +
+Opdat de ontvanger synchroon zou blijven lopen met de zender (er is geen afzonderlijk kloksignaal), is het nodig dat er regelmatig een overgang in het signaal optreedt. In het geval dat er meer dan 6 opeenvolgende bits op 1 staan, wordt na het 6e bit automatisch een 0 ingevoegd (bit-stuffing) door de zender. Dat extra 0-bit moet door de ontvanger uiteraard weer verwijderd worden. Op deze manier wordt een betrouwbare gegevensoverdracht verzorgd, die nog aangevuld wordt met een CRC-foutcontrole per pakket. 
+
+image::ch07/images/nrzi.png[alt="voorbeeld NRZI-codering met bitstuffing",align="center",scaledwidth="70",width="500"]  
+
+De communicatie in de twee richtingen (host<->device) gebeurt over hetzelfde draadpaar. Dit is dus vergelijkbaar met half-duplex.
+
+====	Communicatie over USB
+
+Zoals de naam al aangeeft, wordt het medium bij de Universal Serial Bus gedeeld over alle aangesloten apparaten (shared bandwidth). Daarnaast wordt er gebruik gemaakt van het master/slave principe zodat de host-controller(de master) de volledige controle heeft over de communicatie via de USB-bus.
+
+=====	Frames, pakketten
+
+De host verdeelt de tijd in frames met een vaste lengte (1 msec voor Low- en Full-speed, 125 µsec voor High-speed). Elk frame wordt op zijn beurt opgedeeld in een aantal pakketten (lengte kan variëren) waarvan het eerste een SOF (Start-Of-Frame) pakket is, bedoeld voor frame synchronisatie tussen de verschillende apparaten. Elk pakket is gekoppeld aan een apparaat en daarbinnen aan een endpoint (vergelijkbaar met een TCP-poortnummer).
+
+image::ch07/images/USB_frames.png[align="center",alt="USB frames (bron onbekend)",width="500"] 
+
+Binnen een pakket vind je enkele belangrijke velden:
+
+De Sync-vlag (00000001):: 
+	is bedoeld voor bit- en byte-synchronisatie. 
+De Packet-ID (of PID):: 
+	geeft het type van het pakket weer (Token, Data, Handshake, Special, ...). 
+Het Data-veld:: 
+	bevat naast eventuele gegevens ook het adres van het apparaat waaraan het pakket gekoppeld is en het endpoint.
+
+Gedurende het EOP-gedeelte worden de twee datalijnen beide laag gehouden gedurende een bittijd. Hierdoor detecteren alle aangesloten apparaten het einde van het pakket.
+Een volledige transfer tussen de host en een apparaat zal opgebouwd worden door verschillende pakketten die eventueel in verschillende frames kunnen zitten.
+
+Er onderscheiden zich vier types van pakketten. 
+
+* Start-of-frame: geeft het begin aan van een nieuw frame inclusief een 11 bit frame nummer.
+* Token: het token geeft de richting aan van de pakketten. 
+** IN:: informeert het toestel dat de host iets wil ontvangen
+** OUT:: informeert het toestel dat de host iets wil versturen
+** SETUP:: wordt gebruikt om een transfer te starten.
+* Handshake
+** ACK:: geeft een bevestiging dat de info correct werd ontvangen
+** NAK:: geeft aan dat het toestel eventjes geen data kan zenden of ontvangen, of dat er geen data beschikbaar is op dit moment.
+** STALL:: het toestel bevindt zich in een staat waarin de host actie moet ondernemen.
+* Data: bevat maximum 1024 bytes aan data. Er zijn ook verschillende subtypes:
+** Data0
+** Data1
+** Data2 (enkel bij high-speed)
+** MDATA (enkel bij high-speed)
+
+Aanvullende uitleg en verdere verduidelijking vind je op http://www.beyondlogic.org/usbnutshell/usb3.shtml#USBPacketTypes 
+
+====	Endpoints
+
+Voor de communicatie met de host, beschikt elk USB-device over een aantal endpoints (maximaal 16): dit zijn meestal kleine databuffers in het geheugen van de microcontroller van het randapparaat. Die buffers worden gebruikt om de informatie uit een pakket op te slaan. +
+Om gegevens uit te wisselen tussen de host en een USB-apparaat wordt een verbinding opgezet (pipe genaamd) tussen een endpoint en de host. De richting wordt gespecificeerd vanuit het standpunt van de host: Een IN-endpoint stuurt data van het apparaat naar de computer. Bij een OUT-endpoint ontvangt het apparaat data van de computer. +
+Een uitzondering op die regel: endpoint 0 is bedoeld voor controle van de verbinding en laat communicatie in de twee richtingen toe (is eigenlijk een combinatie van een IN- en een OUT-endpoint, beide met hetzelfde nummer).
+
+//deze is miserie?
+image:ch07/images/endpoint.png[align="center", scaledwidth="40", alt="USB endpoints (bron: beyondlogic.org)",width="500"]
+
+====	Types van transfers
+USB is ontworpen om verschillende soorten apparaten te bedienen, elk met zijn eigen specificaties (gegevensdebiet, reactietijd, foutcorrectie,...). Om aan alle mogelijke situaties tegemoet te komen zijn er vier soorten transfers voorzien:
+
+CONTROL transfers:: 
+	worden gebruikt voor het beheer van de USB. Via control transfers over de control-pipe (naar endpoint 0) leest de host informatie over een apparaat en ontvangt het apparaat configuratie-informatie (zoals een device-adres). Elk USB-apparaat moet controltransfers ondersteunen.
+BULK transfers:: 
+	zijn bedoeld voor situaties waar veel gegevens moeten doorgestuurd worden, maar waarbij de snelheid niet kritisch is: disk, printers, scanners,... Als de USB bezet is met verkeer dat een gegarandeerde bandbreedte vereist (isochrone transfers), dan zal een bulktransfer moeten wachten. Wanneer er daarbuiten weinig verkeer is, zal een bulk-transfer zeer snel verlopen.
+INTERRUPT transfers:: 
+	worden gebruikt wanneer een apparaat op regelmatige tijdstippen de gelegenheid moet krijgen om gegevens te verzenden of ontvangen. Voorbeelden hiervan zijn een toetsenbord, een joystick, een muis: hierbij wordt een limiet vereist op de reactietijd van de computer. In tegenstelling tot wat je uit de naam zou verwachten, is een interrupttransfer gebaseerd op regelmatige polling door de host-controller. Vermits USB een puur master/slave systeem is, zijn er geen interrupt-mogelijkheden voor de USB-apparaten.
+ISOCHRONE transfers:: 
+	garanderen een gevraagde bandbreedte, maar voorzien geen foutcorrectie. Wanneer geluid of video over USB wordt doorgestuurd, zal men gebruik maken van isochrone transfers. Hierbij zorgt de host-controller ervoor dat alle toegestane transfers goed verlopen. Wanneer software een aanvraag doet om bijvoorbeeld een isochrone transfer op te zetten met een bepaald apparaat, wordt eerst nagegaan of er nog voldoende bandbreedte over is op de bus (of er in elk frame nog voldoende plaats vrij is). Voldoende plaats betekent dat steeds voldoende ruimte moet overblijven voor noodzakelijke controle transfers. 
+	In een frame komen eerst de isochrone transfers aan bod. Vervolgens worden de interrupt apparaten gepold (en wordt eventueel de nodige interrupt data getransfereerd). Op deze manier komen alle apparaten die een bepaalde bandbreedte of een bepaalde korte reactietijd nodig hebben steeds aan bod. Wat overblijft van de tijd in een frame, kan ingenomen worden door bulktransfers. Dit is minimaal de nog niet toegekende tijd, maar kan ook niet gebruikte tijd voor controle of interrupt transfers zijn. 
+
+=====	Verloop van een transfer. 
+
+image::ch07/images/transint.png[align="center",alt="voorbeeld van een interrupt transfer (bron: beyondlogic.org)",scaledwidth="50",width="400"]
+
+De transfer begint met de host controller die aangeeft in welke richting de data zal gaan: in-token voor data van apparaat naar host controller, out-token voor de omgekeerde inrichting. Vervolgens wordt de data verzonden (afhankelijk van de richting gebeurt dit door het apparaat of de host controller). In het geval van een transfer richting host controller, kan het apparaat ook reageren met een NAK. Dit betekent dat er geen data te versturen is. Geen reactie op het token bericht betekent dat dit token een fout bevatte. Na de data volgt nog een bevestiging, die aangeeft dat de data correct ontvangen is. In het geval van een transfer richting apparaat kan dit ook bevestigen met een NAK. Dit betekent dat het apparaat de inkomende data op dat ogenblik niet kan verwerken. Andere transfers verlopen op gelijkaardige manier. +
+Bij isochrone transfers zullen er geen bevestigingen zijn, terwijl na een controle transfer nog een extra statusfase zal volgen waarbij de verwerking van een commando wordt bevestigd.
+
+====	Enumeratie en P&P
+Zoals bij de inleiding al vermeld, is USB ontworpen met het oog op een volledige integratie met het Plug&Play gebeuren. De bedoeling is dan ook dat een gebruiker een USB-apparaat aansluit, dat het automatisch herkend wordt door het besturingssysteem, dat de juiste drivers geladen worden waarna het apparaat gebruikt kan worden, zonder dat die gebruiker iets moet configureren. Om dit mogelijk te maken zijn er wel een aantal stappen nodig: detectie van nieuwe apparatuur en snelheid daarvan.
+
+.pull-up weerstand voor detectie van nieuwe apparaten
+image::ch07/images/USBpullup.png[alt="pull-up weerstand voor detectie nieuw apparaat", scaledwidth="80", align="center"]
+
+Langs de kant van de host (of hub) zijn de twee datalijnen via 2 pull-down weerstanden (15 k) verbonden met de massa. Daardoor ziet de host een laag niveau op beide datalijnen (D+ en D-). +
+Een Low-speed device heeft van zijn kant een pull-up weerstand van 1,5k tussen de voedingsspanning en D- (bij de full- en high-speed apparaten is dat naar de D+ lijn). + 
+Wanneer een apparaat aangesloten wordt, zal langs de kant van de host (hub)een van beide D-lijnen naar een hoog niveau getrokken worden. Hierdoor detecteert deze dat er een nieuw apparaat op de bus aanwezig is en ook of dit al dan niet een low-speed device is. Elke hub heeft een interrupt IN-pipe waardoor de nieuwe aansluiting doorgegeven wordt naar de host.
+
+=====	Enumeratie
+Bij het opstarten van de computer en telkens er een nieuw apparaat gedetecteerd wordt, zal er een procedure doorlopen worden: de zogenaamde enumeratie. Hierbij is het de bedoeling dat het apparaat een uniek adres toegewezen krijgt, dat het besturingssysteem informatie opvraagt over het apparaat en dat het weet welke drivers er eventueel geladen moeten worden. +
+Wanneer een nieuw device gedetecteerd wordt (Windows XP/Vista geeft hiervan een melding in de system-tray), zal de host een aanvraag voor informatie sturen naar endpoint 0 (de controle-endpoint) van device-adres 0 (geen enkel actief apparaat heeft adres 0). Die informatie bestaat uit een aantal descriptors: records met vooraf bepaalde velden die alle nodige informatie bevatten die de host-controller nodig heeft. In een volgende stap kent de host een USB-adres toe aan het nieuwe apparaat (verschillend van 0), waarna nog wat informatie uitgewisseld wordt tussen host en apparaat. 
+
+In de ontvangen device-descriptor staat onder andere een veld dat de fabrikant van het apparaat identificeert (zoals bij een netwerkkaart, aan te vragen bij het USB-consortium) en een veld dat door die fabrikant toegekend wordt om het model van het apparaat te identificeren. Bij die configuratie worden ook andere configuratieparameters (configuration-descriptor) uitgewisseld waarin onder meer bepaald wordt hoeveel stroom het apparaat nodig zal hebben. 
+
+Daarna zullen ook nog interface descriptors uitgewisseld worden. Deze bevatten informatie over het aantal endpoints dat het device nodig heeft, en welke device classes ondersteund worden. +
+
+Tot slot worden ook nog endpoint descriptors doorgestuurd. Daarin staat per endpoint beschreven hoe het verkeer zal georganiseerd worden (bulk, interrupt, …), hoe vaak er moet gepold worden in het geval van interrupt transfer, de richting van de endpoint (IN/OUT), … +
+
+Op basis van die Vendor-en Product- ID’s  en de informatie die in de descriptors gevonden wordt, zal het besturingssysteem in de beschikbare INF-bestanden zoeken naar een geschikte driver. Als die niet gevonden wordt zal bijvoorbeeld Windows 8 online op zoek gaan. De pas geladen driver zal bij zijn initialisatie zelf het USB-apparaat (of beter de controller daarin) verder configureren, waarna het toestel gebruikt kan worden.
+
+====	Device Classes, Drivers
+Bij het overlopen van alle mogelijke randapparaten voor een computer kunnen die in een aantal grote groepen ingedeeld worden. Bij het ontwerp van de USB-standaard zijn een aantal device-classes en subclasses gedefinieerd. Elk toestel moet bij de enumeratie in de device-descriptor ook meegeven tot welke groep het behoort. Voor elke vastgelegde class en subclass is ook de structuur van de driver vastgelegd samen met de vereisten voor de firmware van het apparaat zelf (een soort API).
+
+Enkele voorbeelden van classes: 
+
+*	Audio devices 
+*	Mass Storage devices 
+*	Monitors 
+*	Communication devices (modems) 
+*	Printers Still image capture devices (scanner, camera,...) 
+*	HID (Human interface devices)
+
+Een mordern besturingssysteem bevat drivers voor een aantal veel voorkomende classes. Voor apparaten uit die groepen hoeft de fabrikant geen eigen drivers meer te schrijven (tenzij er extra functionaliteit gevraagd wordt). +
+Een belangrijke groep is de HID-class: deze is origineel bedoeld voor I/O apparatuur als toetsenbord, muis en dergelijke. De vereisten voor deze toestellen zijn zeer beperkt, zodat het vrij gemakkelijk is om een toestel (en de bijhorende firmware) te ontwerpen dat binnen deze groep past, met als voordeel dat daarvoor geen drivers geschreven hoeven te worden (ze zijn immers al binnen het besturingssysteem aanwezig).
+
+====	USB 3.0
+De USB standaard versie 3 verzekert de toekomst van deze technologie. Om deze hoge snelheden te kunnen halen, waren wel enkele compromissen nodig. 
+Zo was dezelfde connector niet langer bruikbaar. Alles is gelukkig backwards compatibel, maar een USB3 connector zal je makkelijk kunnen herkennen aan de blauwe kleur van de binnenkant van de connector.
+
+image::ch07/images/USB3connector.jpg[alt="USB3-connector",scaledwidth="25",align="center"] 
+
+Ondanks de fysieke compatibiliteit zijn er een flink aantal verschillen te bespeuren in de nieuwe versie. Kijk je bijvoorbeeld naar een dwarsdoorsnede van een USB3.0-kabel, dan merk je een groot verschil. Het data-paar van USB2.0 is nog steeds aanwezig, maar is enkel daar om compatibiliteit te garanderen. 
+De snelle data zal verplaatst worden over twee Shielded Differential Pairs. +
+Deze geïsoleerde geleiders  zorgen er uiteraard voor dat deze kabels een stuk minder soepel zullen zijn dan hun voorgangers. +
+Een ander interessant detail is dat deze standaard voorziet in een grotere stroomlevering aan apparaten: 900mA ten opzichte van 500mA bij de huidige (2.0) standaard. +
+De encoding gebeurt ook niet langer met NRZI, maar met 8b/10b, de methode die ook gebruikt wordt bij SATA, SAS, PCI Express.
+ 
+image::ch07/images/usb3-kabeldoorsnede.png[alt="Dwarsdoorsnede USB3-kabel (bron onbekend)",align="center", scaledwidth="35",]
+
+=====	Signalering
+
+Ook de signalering is bij USB 3.0 op de schop genomen. Het typerende polling-concept is niet meer zo sterk aanwezig. Dat geeft voordelen naar zuinigheid van de apparaten. Ze moeten immers niet constant actief zijn. +
+
+Andere significante wijzigingen:
+
+*	verkeer is nu full duplex ten opzichte van half-duplex in USB 1 en 2.
+*	de protocolstack is een stuk complexer
+*	bulk streams is een nieuwe, vijfde transfermethode
+*	toevoegen van een link layer
+*	fel verbeterd power management
+*	door complexiteit is de maximale kabellengte beperkt tot ongeveer 3 meter.
+ 
+
+image::ch07/images/usb3.0_architecture.jpg[scaledwidth="50",alt="USB3 protocol stack (bron:onbekend",align="center"]
+
+===	Thunderbolt
+
+De Thunderbolt interface is te vinden op alle nieuwe Apple-hardware, en heeft z’n reden.  De standaard werd ontwikkeld door Intel in samenwerking met Apple. +
+De eerste apparaten die hiermee werden uitgerust, werden uitgebracht in februari 2011 (Macbook Pro). Mondjesmaat wordt extra randapparatuur uitgebracht die dit ondersteunt. De standaard probeert nog universeler te zijn dan USB door de kracht van displayport (zie verder) en PCIx te combineren in één enkele poort. 
+
+==== Architectuur
+ 
+.Thunderbolt architectuur (bron:Intel)
+image::ch07/images/Thunderbolt_Technology_model_1_E.png[alt="Thunderbolt architectuur (bron: Intel)",scaledwidth="40", align="center"]
+
+Thunderbolt is in staat om 10Gpbs te transfereren over een koperverbinding. Initieel had Intel de bedoeling om  de bekabeling met glasvezels te produceren, maar voorlopig is dat niet het geval. De bouw ervan was te duur, en een bijkomend probleem was dat op die manier geen stroomvoorziening kan gebeuren voor de randapparaten. Er wordt echter nog steeds ontwikkeld, dus misschien duikt dit alsnog op in een volgende versie. +
+De architectuur van Thunderbolt  zet alles in op performantie. Daarvoor wordt de PCH  via een PCIe 4x-poort verbonden met de Thunderbolt controller, en is die laatste ook verbonden met het interne grafisch systeem van de computer. Het resultaat is dat over deze verbinding een PCIx verbinding en een Displayport gebundeld zijn. Daarnaast ondersteunt Thunderbolt ook daisy chaining tot maximaal zeven apparaten. Dat betekent dat je Thunderbolt-compatibele apparaten kan doorlussen. +
+Een goed voorbeeld van hoe dit gebruikt wordt, vind je bijvoorbeeld in het Apple Thunderbolt Display. Dat is een scherm dat bedoeld is voor de apple macbook pro’s als tweede scherm. Met een enkele Thunderbolt kabel naar dat schem wordt echter veel mogelijk: 
+
+* een 27” scherm met 2560-by-1440 resolutie krijgt z’n beelden door deze kabel
+* er is een camera ingebouwd
+* er is HD audio voorzien
+* er is een connector voor Gigabit Ethernet voorzien
+* er is een Firewire 800 connector voorzien.
+
+Dat alles gebeurt met deze enkele Thunderbolt-kabel.  
+
+==== Veiligheid
+
+Criticasters hekelen de veiligheid van Thunderbolt, net omdat je rechtstreeks verbonden bent als een PCIx-poort, en je dus ook toegang hebt tot het geheugen van het host-apparaat. Bedenk zelf de risico’s die daarmee gepaard gaan…
+
+Welke technische verklaring kan je dus (aan de hand van dit hoofdstuk) geven aan onderstaand filmpje?
+
+video::tsb6ojxa3ik[youtube, width=360, height=240, align="center"]

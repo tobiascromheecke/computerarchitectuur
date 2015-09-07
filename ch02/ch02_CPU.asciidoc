@@ -1,0 +1,189 @@
+
+== CPU 
+
+===	Overzicht
+In onderstaande tabel worden een aantal processoren van de x86 familie weergegeven met hun belangrijkste eigenschappen. De processor die in de eerste (IBM-)PC werd gebruikt was een 8088. Eigenlijk was dit een 8086 waarvan de databus beperkt werd tot 8 bits in plaats van 16 bits. De enige reden hiervoor was dat op dat ogenblik er geen andere 16-bit componenten beschikbaar waren. 
+Deze processorfamilie komt uitgebreid aan bod binnen het vak processorarchitectuur.
+Het is niet de bedoeling om hier terug te komen op programmeermodel, segmentering, ... 
+
+Wel zullen we de evolutie van een aantal eigenschappen bekijken.
+
+.processoroverzicht
+[format="csv", options="header"]
+|===
+type,		jaar,data/adres-bus,L1 cache (kB),FSB (MHz),Clock(MHz),transistoren (miljoen),technologie (nm)
+8088,		1979, 8/20 , - ," 4,77..8 ","4,77..8 ",0.029,3000
+8086,		1978, 16/20 , - ," 4,77..8 ","4,77..8 ",0.029,3000
+80286,		1980, 16/24 , - , 6..20 ,6..20 ,0.134,1500
+80386DX ,	1985, 32/32 , - , 16..33 ,16..33 ,0.275,1500
+80486DX/SX ,1989, 32/32 ,8, 25..50 ,25..50 ," 1.2 ",1000
+80486DX2 ,	1992, 32/32 ,8, 25..40 ,25..80 ," 1.2 ",800
+80486DX4 ,	1994, 32/32 , 8+8 , 25..40 ,75..120 ," 1.2 ",600
+Pentium ,	1993, 64/32 , 8+8 , 60..66 ,60..200 , 3 ,600
+Pentium MMX,1997, 64/32 , 16+16 ,66,166..233 ," 4.5 ",350
+Pentium Pro,1995, 64/36 , 8+8 ,66,150..200 ,5.5,350
+Pentium II ,1997, 64/36 , 16+16 , 66/100 ,300..450 ," 7.5",250
+Pentium III,1999, 64/36 , 16+16 , 100/133 ,450..1300 , 28 ,130
+AMD Athlon ,1999, 64/36 , 64+64 , 200/266 ,500..2200 , 37 ,130
+Pentium IV ,2001, 64/36 , 8+96 , 400/533 ,1400..2800 , 42 ,130
+AMD 64 ,	2005, 64/36 , 2*512k L2 ,2000,"2,4GHz ", 233 ,102
+Core duo ,	2006, 64/36 , 2*2M L2 ,800,"3,6GHz ", 376 ,65
+Intel Nehalem,2008,64/36,32+32/core,-,"3,2 GHz",731 (QC),45/32
+Intel Sandy Bridge,2011,64/36,32+32/core,-,"3,8 GHz.",995 (QC),32
+Intel Ivy bridge,2012,64/36,32+32/core,-,"3,9 GHz.",1400 (QC),22
+Intel Haswell	,2013,64/36,32+32/core,-,"3,9 GHz.","1400",22
+Intel Broadwell	,2014,,,,,,14
+Intel Skylake, 2015
+|===
+
+WARNING: De maximale kloksnelheid bij recente processoren kan enkel voor korte periodes gehaald worden bij zware belasting. Als de temperatuur van de processor te warm wordt, zal de processor automatisch naar een lagere snelheid gaan. Dit wordt bereikt met technologieën als Turboboost.
+
+===	Technologie en functionaliteit
+Een eerste duidelijke evolutie is de toename van het aantal transistors. Volgens de wet van Moore verloopt deze stijging zelfs exponentieel. Elke vierentwintig maanden zou het aantal transistors in een processor verdubbelen. Die toename is uiteraard enkel mogelijk als de transistordichtheid kan toenemen. In het verleden werd hierbij vaak gedacht dat er technische beperkingen zouden opduiken, maar tot dusver blijven fabrikanten slagen om vast te houden aan de ontwikkelsnelheid die geponeerd werd door Gordon More, één van de oprichters van Intel.
+
+[quote,Gordon Moore,  Electronics Magazine 1965]
+The number of transistors incorporated in a chip will approximately double every 24 months
+ 
+.Wet van Moore (CC, Wikimedia Commons)
+image::ch02/images/mooreslaw2015.png[alt="Moores Law", align="center", scaledwidth="100"]
+
+Met deze stijging van het aantal transistoren gaat uiteraard ook een toename in functionaliteit gepaard. Zo kent een x86 processor vanaf de 80286/80386 (in principe vanaf de 286, praktisch vanaf de 386) twee werkingsmodi: real mode en protected mode.
+
+In real mode heeft de cpu dezelfde functionaliteit als een 8086.
+In deze compatibiliteitsmodus gedraagt hij zich met andere woorden als een snellere versie van de 8086. In protected mode krijgt de processor extra functionaliteit. De naam protected mode komt van de extra toevoegingen op het vlak van geheugenbescherming. Daarnaast ondersteunde de processor vanaf deze modus een aantal, vandaag onmisbare, extra mogelijkheden.
+
+Onder andere multitasking en virtueel geheugen zijn enkel mogelijk met een protected mode processor. Hier moet nog opgemerkt worden dat processoren nog steeds opstarten in real mode. Het is de taak van het besturingssysteem (of beter de loader ervan) om de processor om te schakelen naar protected mode. +
+Andere voorbeelden van extra functionaliteit zijn de integratie van functies die eerst door externe componenten werden vervuld. Bijvoorbeeld werd vanaf de 486 een floating point unit in de processor geïntegreerd. Een ander voorbeeld zijn cache geheugens. De extra functionaliteit uit zich ook op het vlak van de instructieset. Zo zijn in de loop der tijden een aantal extra instructies toegevoegd om aan bepaalde behoeften te voldoen. Een belangrijk voorbeeld zijn de instructies die het gebruik van multimedia moeten ondersteunen (bijvoorbeeld MMX, SSE, 3DNow) en de ondersteuning voor virtualisatie (bijvoorbeeld Intel VT-d, Amd-V). 
+
+Software die gebruik maakt van dit soort instructies, kan uiteraard niet uitgevoerd worden op processoren die deze instructies niet ondersteunen.
+
+Intel, de grootste producent van x86 processoren, hanteert voor de ontwikkeling een model dat het tick/tock-model genoemd wordt. Afwisselend worden nieuwe modellen uitgebracht met nieuwe funcitonaliteit (tock) en verbeterde technologie (tick). Dit wordt duidelijk in volgende intel roadmap.
+
+
+.Intel processor roadmap (copyright CC Wikimedia )
+image::ch02/images/intelcpuarchitectures_wikimediacc.png[alt="Intel CPU roadmap", align="center", scaledwidth="100"]
+
+// bron: https://en.wikipedia.org/wiki/List_of_Intel_CPU_microarchitectures
+
+=== Kloksnelheid
+
+Een tweede evolutie is waar te nemen op het vlak van de kloksnelheid, die duidelijk toegenomen is. In de beginjaren van de pc was te zien dat CPU klok en FSB klok samen toenamen. Na verloop van tijd ontstaat er een verschil tussen de processorklok en de FSB klok, die nog wel stijgt, maar een stuk minder snel. De processor wordt met andere woorden duidelijk het snelste onderdeel in het computersysteem. Het zal erop aan komen de werkkracht van de CPU zo weinig mogelijk onbenut te laten. In het bijzonder zullen maatregelen genomen moeten worden om zo weinig mogelijk tijd te verliezen bij het wachten op tragere componenten. De trend naar steeds stijgende kloksnelheden is tijdens het laatste decennium afgenomen. Bij de Pentium 4 werd nog volop gemikt op de 4GHz grens, waar enige jaren tegenaan gebotst werd. 
+
+Het belangrijkste probleem bij steeds hogere kloksnelheden is de gegenereerde warmte. Die moet in de eerste plaats uiteraard afgevoerd worden, maar geeft daarnaast ook nog een hoger verbruik. +
+In het bijzonder bij laptops zijn dit twee vervelende problemen: de warmteafvoer vraagt grotere (en dus zwaardere) koellichamen en ventilatoren. Extra verbruik verkleint uiteraard de autonomie van een draagbaar toestel (tijd dat op accu gewerkt kan worden).
+
+===	Processorarchitectuur
+
+====	Pipelining
+
+Naast de kloksnelheid werd ook aan de interne opbouw van de processor gesleuteld om hem sneller bepaalde taken te laten uitvoeren. Zo werken processoren instructies niet na elkaar af, maar gedeeltelijk tegelijkertijd. Dit gebeurt in een zogenaamde pipeline. Het is eenvoudig om in te beelden dat terwijl de ene instructie uit het geheugen wordt opgehaald, een andere gedecodeerd kan worden en van nog een andere het resultaat berekend kan worden. Hieronder wordt dit principe grafisch voorgesteld. +
+Helaas is dit principe niet zaligmakend: soms zijn instructies afhankelijk van andere, waardoor er een ‘bubble’ optreedt: een tijdspanne waarin de processor verplicht moet wachten.
+  
+.processor pipeline (CC mediawiki)
+image::ch02/images/1000px-Pipeline4stage.png[alt="pipeline", align="center", scaledwidth="100"]
+
+==== Superscalaire processoren
+Als dit principe verder gedreven wordt, kunnen stappen die veel tijd in beslag nemen dubbel uitgevoerd worden. Men spreekt dan over een superscalaire processor. In onderstaande afbeeldingen worden de blokschema’s getoond van de Sandy bridge en de Athlon Bulldozer microarchitectuur. In deze blokschema’s is duidelijk te zien hoe er verschilllende eenheden zijn die berekeningen kunnen maken, waardoor verschillende instructies tegelijkertijd uitgevoerd kunnen worden. 
+Een belangrijke uitdaging hierbij vormen voorwaardelijke spronginstructies. Aangezien pas bij de uitvoering van de instructie geweten is of de sprong uitgevoerd wordt of dat gewoon de volgende instructie wordt uitgevoerd. In het schema zijn hiervoor branch prediction eenheden voorzien. 
+
+Meer details over hun werking en de principes van pipelining en superscalaire architecturen krijg je in het vak "microprocessoren".
+
+ 
+.Sandy bridge microarchitectuur
+image::ch02/images/Sandy-Bridge-Microarchitecture-Small.jpg[alt="Sandy Bridge", align="center", scaledwidth="70"]
+ 
+.AMD bulldozer-architectuur (copyright AnandTech)
+image::ch02/images/bulldozeruarch.jpg[alt="Bulldozer", align="center", scaledwidth="70"]
+
+Multicore processoren (processoren met meerdere rekenkernen) zijn al geruime tijd niet meer weg te denken. Hexacores (processoren met 6 rekenkernen) en octacores (processoren met 8 rekenkernen) zullen de komende jaren eerder regel dan uitzondering worden. +
+Je zou dit een verder doorgedreven vorm van een superscalaire architectuur kunnen noemen. In plaats van delen van de processor te ontdubbelen, wordt een volledige processor ontdubbeld. Een grote moeilijkheid bij deze werkwijzes is om de caches op elkaar af te stemmen. Een probleem dat duidelijker zal worden in het volgende hoofdstuk.
+
+Net zoals een superscalaire architectuur pas voordeel geeft als de verschillende eenheden tegelijk gebruikt worden, zal een dual-core pas voordeel geven als meerdere cores tegelijk werk verrichten. Dit kan als er bijvoorbeeld verschillende programma’s tegelijk actief zijn of als de software zodanig geschreven is, dat ze bestaat uit verschillende threads die naast elkaar (en dus tegelijk door verschillende processorkernen) kunnen uitgevoerd worden.
+
+Een simpel voorbeeldje om de beperkingen van een multicore processor aan te tonen: als je een eenvoudige toepassing een rekenintensieve opdracht laat uitvoeren, dan zal een multicore processor slechts een deel belast worden. Eén processorkern verricht namelijk al het werk. 
+ 
+.single threaded applicatie op multicore processor
+image::ch02/images/singlethread.png[alt="singlethread", align="center", scaledwidth="100"]
+
+
+Het voordeel van de multi-core merk je pas als je tegelijk nog een ander programma probeert te gebruiken. Dat zal met een multi-core vlot lukken, in tegenstelling tot een single core. Het OS zal op zoek gaan naar de minst belastte core, en het nieuwe proces daarop uitvoeren. 
+
+Uiteraard is dit principe nog verder schaalbaar. In servers worden vaak meerdere processoren op één moederbord geprikt, en als ook dat niet langer volstaat, wordt de rekenkracht van meerdere servers gecombineerd. Deze principes overstijgen deze cursus, en komen later in de opleiding aan bod.
+
+==== Cache
+
+Een andere eigenschap die plots opduikt en doorheen de processorgeschiedenis steeds toeneemt is het cache geheugen. De toename van het cache volgt de trend van alle soorten geheugens die in een pc te vinden zijn. 
+Dit is een gevolg van de eerder opgemerkte trend dat de processor veruit het snelste onderdeel is in het systeem, dat zo optimaal mogelijk benut moet worden. Naarmate data en programma’s steeds groter werden, werd ook het belang van geheugen groter. Tot de intrede van de grafische interface was de belangrijkste parameter in het systeem de kloksnelheid van de processor. Met de intrede van de grafische interface was een groter geheugen soms te verkiezen boven een hogere kloksnelheid. 
+Het belang van cache geheugen is ook duidelijk als je de budget- en performance-processoren van fabrikanten met elkaar gaat vergelijken. 
+
+In onderstaand lijstje staan enkele desktop en serverprocessoren opgelijst. Je merkt dat ze qua kloksnelheid niet voor elkaar moeten onderdoen, maar dat de hoeveelheden cache wel verschillen.
+
+De werking van de cache wordt verder in detail besproken in het derde hoofdstuk.
+
+.Cache in desktop en serverprocessoren (actuele topmodellen, feb 2014)
+[format="csv", options="header"]
+|===
+CPU, 		doel, 				cache, 	maxCPU, 	#cores/threads
+Atom 7560,	mobile,				512KB,	2.13 GHz,	1/2
+i7-4771, 	desktop,			8MB, 	3.50 GHz, 	4/8
+E7-8893v2,	server,				37.5MB,	3.40 GHz,	15/30
+|===
+
+=== APU, SoC
+
+De wet van Moore impliceert dat steeds meer mogelijk is op eenzelfde oppervlakte substraat. Die ruimte wordt ingenomen door bijvoorbeeld meerdere cores te huisvesten op eenzelfde processor, maar dat is maar een deel van het verhaal.
+
+Het is namelijk ook zo dat men probeert om steeds meer functionaliteit die voorheen op andere plaatsen op het moederbord te vinden was, te verzamelen op eenzelfde chip. 
+
+Daar zijn een aantal goede redenen voor te bedenken:
+
+* het aantal verschillende chips (en dus kostprijs) op een moederbord kan zo teruggedrongen worden
+* als alle componenten dicht bij elkaar zitten, zijn geen 'trage' bussen nodig tussen deze onderdelen
+* de oppervlakte die nodig is om het systeem te bouwen verkleint zo, een belangrijk argument bij de ontwikkeling van mobile devices.
+
+
+Bij recente processoren zit bijvoorbeeld steeds vaker een grafische chip ingebouwd. Dan spreekt men niet meer over CPU, maar over +APU+ (=advanced processing unit) om dit verschil in de verf te zetten.
+
+Het integratieproces gaat soms zo ver dat je kan spreken van een _System On A Chip_: alle belangrijke onderdelen (cpu, gpu, IO) zitten dan verzameld op één enkele chip. +
+De rol van secundaire chips ("de chipset") wordt dus steeds kleiner. 
+
+.oefening
+====
+Op welke SoC is jouw telefoon gebaseerd?
+
+Bevat de processor van jouw laptop een geïntegreerde grafische kern?
+====
+
+===	Montage
+
+Bij de montage van een processor moet je enkele zaken in acht nemen. 
+
+* De processor moet compatibel zijn met het moederbord. Meestal kom je dit te weten door de socket van de processor te vergelijken met die van het moederbord.
+* De processor plaatsen moet gebeuren zonder het uitoefenen van kracht: de processor valt normaalgezien in z’n socket (ZIF: zero insertion force), waarna je hem kan inklemmen.
+* Mobiele processoren zijn vaak vast op het moederbord gemonteerd, vervangen is dan onmogelijk.
+
+ 
+.LGA2011 socket zonder processor
+image::ch02/images/lga2011_cooler_roundup_002.jpg[alt="singlethread", align="center", scaledwidth="50"]
+
+Tweede belangrijk aandachtspunt bij de installatie van een processor is dat gezorgd moet worden voor voldoende koeling. Dit betekent dat gezorgd moet worden voor een voldoende grote koelvin en ventilator en dat er goed contact is tussen de chip en de koelvin. Hiervoor moet eventueel koelpasta aangebracht worden. Een slecht gekoelde processor kan aanleiding geven tot een instabiel werkende computer en in het meest dramatische geval tot een beschadigde processor.
+
+===	Processoren van de toekomst
+
+Voorspellingen maken is geen sinecure. De trends die ingezet zijn, zullen vermoedelijk nog een hele poos verder gaan, met een verdere miniaturisatie en toename van efficiëntie tot gevolg. +
+Een kaper op de kust voor de x86 technologie die momenteel monopolist is op de PC-markt, is de ARM-architectuur. Hoewel deze absoluut niet nieuw is (eerste ontwerpen gaan terug tot het midden van de jaren 80), biedt deze processorfamilie grote voordelen:
+
+* Deze architectuur is steeds ontworpen geweest voor toestellen met een laag verbruik. Het succes op de mobiele markt (iPAD2,3, nagenoeg alle android smartphones, consumer elektronica, …) is daar niet vreemd aan.
+* Deze architectuur is in licentie bij de meeste chipbakkers
+* Door een RISC-architectuur footnote:[Een Risc architectuur heeft een instructieset waarbij elke instructie een identieke tijd vraagt om uit te voeren. Hoewel dit de complexiteit van instructies beperkt, kan de processor daardoor wel met relatief weinig transistoren gemaakt worden. CISC (Complex instruction Set Computing) processoren, zoals de x86 familie hebben een variabele uitvoeringstijd per instructie. Dat maakt hen beter in staat om complexe instructies toe te laten, maar het maakt het kennelijk moeilijker om het stroomgebruik onder controle te houden. Voor een verdere vergelijking tussen RISC en CISC verwijs ik door naar de 
+cursus processorarchitectuur] (Reduced instruction set computing) van nature efficiënt
+
+De kans dat de RISC architectuur op korte termijn succesvol wordt op de desktopmarkt is gering, en ook het omgekeerde kan gezegd worden over CISC (zoals x86) op mobiele devices. Voor specifieke servertoepassingen zijn er wel http://www.anandtech.com/show/7724/it-begins-amd-announces-its-first-arm-based-server-soc-64bit8core-opteron-a1100[aankondigingen gebeurd] door bijvoorbeeld AMD, dat zich hier sterk wil in specialiseren en profileren. 
+
+Toch lijken deze twee werelden van de gespecialiseerde ARM-architectuur en de meer universele x86 naar elkaar toe te groeien, en zullen de grenzen ongetwijfeld snel vervagen. +
+Microsoft heeft bijvoorbeeld eind 2012 z’n RT tablet vrijgegeven, met ARM SOC. Uiteraard zal software die gecompileerd werd voor x86 op dit soort toestellen niet werken. Ook Google Chromebooks worden zowel met ARM als met x86 gebouwd.
+
+=== Bibliografie bij dit hoofdstuk
+
+[bibliography]
+ - [[[INTEL]]] Intel. http://www.intel.com/content/www/us/en/history/museum-gordon-moore-law.html.
