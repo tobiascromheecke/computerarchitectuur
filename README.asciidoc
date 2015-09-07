@@ -1,0 +1,12 @@
+= computerarchitectuur
+
+WARNING: this repository contains a set of course materials for the course 'computer architecture 1'. +
+The markup used is asciidoc, using the asciidoctor toolchain. The language troughout the documents is Dutch...
+
+== Het lesmateriaal aanpassen
+
+(nog aan te vullen)
+
+== Het lesmateriaal zelf omzetten naar html/pdf
+
+(nog aan te vullen)
