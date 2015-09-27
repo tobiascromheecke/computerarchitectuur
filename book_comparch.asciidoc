@@ -1,7 +1,9 @@
+:toc: left
+:toc-title: Inhoudstafel
+
 = Computerarchitectuur
 Roel Van Steenberghe <roel.vansteenberghe@gmail.com>
 
-:toc:
 :icons: font
 :numbered: 
 :doctype: book
