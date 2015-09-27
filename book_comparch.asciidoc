@@ -1,16 +1,13 @@
 = Computerarchitectuur
-Roel Van Steenberghe <roel.vansteenberge@gmail.com>
+Roel Van Steenberghe <roel.vansteenberghe@gmail.com>
 
+:toc:
 :icons: font
-:toc: left
 :numbered: 
 :doctype: book
 :stem: latexmath
-
-
 :source-highlighter: pygments
 
-:toc:
 include::ch00_dedication.asciidoc[]
 include::ch00_preface.asciidoc[]
 include::ch01/ch01_power.asciidoc[]
