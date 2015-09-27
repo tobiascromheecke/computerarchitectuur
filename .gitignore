@@ -1,10 +1,16 @@
+#Vagrant files
 Vagrantfile
+
 book_comparch.html
 book_comparch.pdf
 book_comparch.pdfmarks
 Vagrantfile.*
+
 .vagrant
 
+#rendered pdfs & html
+book_comparch.pdf
+book_comparch.html
 
  
 # OS generated files #
