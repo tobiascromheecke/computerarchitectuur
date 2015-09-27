@@ -1,4 +1,9 @@
 Vagrantfile
+book_comparch.html
+book_comparch.pdf
+book_comparch.pdfmarks
+Vagrantfile.*
+.vagrant
 
 
  
