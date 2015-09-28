@@ -114,13 +114,13 @@ Uiteraard is dit principe nog verder schaalbaar. In servers worden vaak meerdere
 
 ==== Cache
 
-Een andere eigenschap die plots opduikt en doorheen de processorgeschiedenis steeds toeneemt is het cache geheugen. De toename van het cache volgt de trend van alle soorten geheugens die in een pc te vinden zijn. 
-Dit is een gevolg van de eerder opgemerkte trend dat de processor veruit het snelste onderdeel is in het systeem, dat zo optimaal mogelijk benut moet worden. Naarmate data en programma’s steeds groter werden, werd ook het belang van geheugen groter. Tot de intrede van de grafische interface was de belangrijkste parameter in het systeem de kloksnelheid van de processor. Met de intrede van de grafische interface was een groter geheugen soms te verkiezen boven een hogere kloksnelheid. 
-Het belang van cache geheugen is ook duidelijk als je de budget- en performance-processoren van fabrikanten met elkaar gaat vergelijken. 
+Een andere eigenschap die plots opduikt en doorheen de processorgeschiedenis steeds aan belang toeneemt is het cache-geheugen. +
+Dit is een gevolg van de eerder opgemerkte trend dat de processor veruit het snelste onderdeel is in het systeem, dat zo optimaal mogelijk benut moet worden. Naarmate data en programma’s steeds groter werden, werd ook het belang van geheugen groter. Programma's worden namelijk in het geheugen geladen voor ze uitgevoerd worden. Het geheugen sneller maken (of delen ervan) heeft dan ook vaak een groter effect dan het snelste onderdeel van de computer (de processsor) nog een fractie sneller te maken. +
+Het belang van cache geheugen is ook duidelijk als je de budget- en performance-processoren van fabrikanten met elkaar gaat vergelijken: de grootte en snelheid van het cache-geheugen is één van de voornaamste verschillen.
 
 In onderstaand lijstje staan enkele desktop en serverprocessoren opgelijst. Je merkt dat ze qua kloksnelheid niet voor elkaar moeten onderdoen, maar dat de hoeveelheden cache wel verschillen.
 
-De werking van de cache wordt verder in detail besproken in het derde hoofdstuk.
+De werking van de cache wordt verder in detail besproken in het volgende hoofdstuk.
 
 .Cache in desktop en serverprocessoren (actuele topmodellen, feb 2014)
 [format="csv", options="header"]
