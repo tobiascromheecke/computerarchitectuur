@@ -85,7 +85,7 @@ Helaas is dit principe niet zaligmakend: soms zijn instructies afhankelijk van a
 image::ch02/images/1000px-Pipeline4stage.png[alt="pipeline", align="center", scaledwidth="100"]
 
 ==== Superscalaire processoren
-Als dit principe verder gedreven wordt, kunnen stappen die veel tijd in beslag nemen dubbel uitgevoerd worden. Men spreekt dan over een superscalaire processor. In onderstaande afbeeldingen worden de blokschema’s getoond van de Sandy bridge en de Athlon Bulldozer microarchitectuur. In deze blokschema’s is duidelijk te zien hoe er verschilllende eenheden zijn die berekeningen kunnen maken, waardoor verschillende instructies tegelijkertijd uitgevoerd kunnen worden. 
+Als dit principe van parallelle verwerking verder doorgedreven wordt, kunnen stappen die veel tijd in beslag nemen ontdubbeld worden. Men spreekt dan over een superscalaire processor. In onderstaande afbeeldingen worden de blokschema’s getoond van de Sandy bridge en de Athlon Bulldozer microarchitectuur. In deze blokschema’s is duidelijk te zien hoe er verschilllende eenheden zijn die berekeningen kunnen maken, waardoor verschillende instructies tegelijkertijd uitgevoerd kunnen worden. +
 Een belangrijke uitdaging hierbij vormen voorwaardelijke spronginstructies. Aangezien pas bij de uitvoering van de instructie geweten is of de sprong uitgevoerd wordt of dat gewoon de volgende instructie wordt uitgevoerd. In het schema zijn hiervoor branch prediction eenheden voorzien. 
 
 Meer details over hun werking en de principes van pipelining en superscalaire architecturen krijg je in het vak "microprocessoren".
@@ -97,7 +97,7 @@ image::ch02/images/Sandy-Bridge-Microarchitecture-Small.jpg[alt="Sandy Bridge", 
 .AMD bulldozer-architectuur (copyright AnandTech)
 image::ch02/images/bulldozeruarch.jpg[alt="Bulldozer", align="center", scaledwidth="70"]
 
-Multicore processoren (processoren met meerdere rekenkernen) zijn al geruime tijd niet meer weg te denken. Hexacores (processoren met 6 rekenkernen) en octacores (processoren met 8 rekenkernen) zullen de komende jaren eerder regel dan uitzondering worden. +
+*Multicore* processoren (processoren met meerdere rekenkernen) zijn al geruime tijd niet meer weg te denken. Hexacores (processoren met 6 rekenkernen) en octacores (processoren met 8 rekenkernen) zijn tegenwoordig eerder regel dan uitzondering geworden. +
 Je zou dit een verder doorgedreven vorm van een superscalaire architectuur kunnen noemen. In plaats van delen van de processor te ontdubbelen, wordt een volledige processor ontdubbeld. Een grote moeilijkheid bij deze werkwijzes is om de caches op elkaar af te stemmen. Een probleem dat duidelijker zal worden in het volgende hoofdstuk.
 
 Net zoals een superscalaire architectuur pas voordeel geeft als de verschillende eenheden tegelijk gebruikt worden, zal een dual-core pas voordeel geven als meerdere cores tegelijk werk verrichten. Dit kan als er bijvoorbeeld verschillende programma’s tegelijk actief zijn of als de software zodanig geschreven is, dat ze bestaat uit verschillende threads die naast elkaar (en dus tegelijk door verschillende processorkernen) kunnen uitgevoerd worden.
@@ -110,7 +110,7 @@ image::ch02/images/singlethread.png[alt="singlethread", align="center", scaledwi
 
 Het voordeel van de multi-core merk je pas als je tegelijk nog een ander programma probeert te gebruiken. Dat zal met een multi-core vlot lukken, in tegenstelling tot een single core. Het OS zal op zoek gaan naar de minst belastte core, en het nieuwe proces daarop uitvoeren. 
 
-Uiteraard is dit principe nog verder schaalbaar. In servers worden vaak meerdere processoren op één moederbord geprikt, en als ook dat niet langer volstaat, wordt de rekenkracht van meerdere servers gecombineerd. Deze principes overstijgen deze cursus, en komen later in de opleiding aan bod.
+Uiteraard is dit principe nog verder schaalbaar. In servers worden vaak meerdere processoren op één moederbord geprikt (*multiprocessor*), en als ook dat niet langer volstaat, wordt de rekenkracht van meerdere servers gecombineerd. Deze principes overstijgen deze cursus, en komen later in de opleiding aan bod.
 
 ==== Cache
 
