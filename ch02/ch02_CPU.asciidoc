@@ -38,6 +38,8 @@ Intel Skylake   ,2015,  64/36,32+32/core,-,"4,2 Ghz","?",14
 
 WARNING: De maximale kloksnelheid bij recente processoren kan enkel voor korte periodes gehaald worden bij zware belasting. Als de temperatuur van de processor te warm wordt, zal de processor automatisch naar een lagere snelheid gaan. Dit wordt bereikt met technologieën als Turboboost.
 
+REMARK: Intel kondigde aan niet langer details zoals transistor count te delen met het publiek. 
+
 ===	Technologie en functionaliteit
 Een eerste duidelijke evolutie is de toename van het aantal transistors. Volgens de wet van Moore verloopt deze stijging zelfs exponentieel. Elke vierentwintig maanden zou het aantal transistors in een processor verdubbelen. Die toename is uiteraard enkel mogelijk als de transistordichtheid kan toenemen. In het verleden werd hierbij vaak gedacht dat er technische beperkingen zouden opduiken, maar tot dusver blijven fabrikanten slagen om vast te houden aan de ontwikkelsnelheid die geponeerd werd door Gordon More, één van de oprichters van Intel.
 
