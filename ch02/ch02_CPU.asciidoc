@@ -98,9 +98,9 @@ image::ch02/images/Sandy-Bridge-Microarchitecture-Small.jpg[alt="Sandy Bridge", 
 image::ch02/images/bulldozeruarch.jpg[alt="Bulldozer", align="center", scaledwidth="70"]
 
 *Multicore* processoren (processoren met meerdere rekenkernen) zijn al geruime tijd niet meer weg te denken. Hexacores (processoren met 6 rekenkernen) en octacores (processoren met 8 rekenkernen) zijn tegenwoordig eerder regel dan uitzondering geworden. +
-Je zou dit een verder doorgedreven vorm van een superscalaire architectuur kunnen noemen. In plaats van delen van de processor te ontdubbelen, wordt een volledige processor ontdubbeld. Een grote moeilijkheid bij deze werkwijzes is om de caches op elkaar af te stemmen. Een probleem dat duidelijker zal worden in het volgende hoofdstuk.
+Je zou dit een verder doorgedreven vorm van een superscalaire architectuur kunnen noemen. In plaats van delen van de processor te ontdubbelen, wordt een volledige rekeneenheid ontdubbeld. Een grote moeilijkheid bij deze werkwijzes is om de caches op elkaar af te stemmen. Een probleem dat duidelijker zal worden in het volgende hoofdstuk.
 
-Net zoals een superscalaire architectuur pas voordeel geeft als de verschillende eenheden tegelijk gebruikt worden, zal een dual-core pas voordeel geven als meerdere cores tegelijk werk verrichten. Dit kan als er bijvoorbeeld verschillende programma’s tegelijk actief zijn of als de software zodanig geschreven is, dat ze bestaat uit verschillende threads die naast elkaar (en dus tegelijk door verschillende processorkernen) kunnen uitgevoerd worden.
+Net zoals een superscalaire architectuur pas voordeel geeft als de verschillende eenheden tegelijk gebruikt worden, zal een dual-core pas voordeel geven als meerdere cores tegelijk werk verrichten. Dit kan als er bijvoorbeeld verschillende programma’s tegelijk actief zijn of als de software zodanig geschreven is, dat ze bestaat uit verschillende *threads* die naast elkaar (en dus tegelijk door verschillende processorkernen) kunnen uitgevoerd worden.
 
 Een simpel voorbeeldje om de beperkingen van een multicore processor aan te tonen: als je een eenvoudige toepassing een rekenintensieve opdracht laat uitvoeren, dan zal een multicore processor slechts een deel belast worden. Eén processorkern verricht namelijk al het werk. 
  
@@ -110,7 +110,7 @@ image::ch02/images/singlethread.png[alt="singlethread", align="center", scaledwi
 
 Het voordeel van de multi-core merk je pas als je tegelijk nog een ander programma probeert te gebruiken. Dat zal met een multi-core vlot lukken, in tegenstelling tot een single core. Het OS zal op zoek gaan naar de minst belastte core, en het nieuwe proces daarop uitvoeren. 
 
-Uiteraard is dit principe nog verder schaalbaar. In servers worden vaak meerdere processoren op één moederbord geprikt (*multiprocessor*), en als ook dat niet langer volstaat, wordt de rekenkracht van meerdere servers gecombineerd. Deze principes overstijgen deze cursus, en komen later in de opleiding aan bod.
+Uiteraard is dit principe nog verder schaalbaar. In servers worden vaak meerdere processoren op één moederbord geprikt (*'multiprocessor architectuur'*), en als ook dat niet langer volstaat, wordt de rekenkracht van meerdere servers gecombineerd ('clustering'). Deze principes overstijgen deze cursus, en komen later in de opleiding aan bod.
 
 ==== Cache
 
@@ -162,7 +162,7 @@ Bij de montage van een processor moet je enkele zaken in acht nemen.
 
 * De processor moet compatibel zijn met het moederbord. Meestal kom je dit te weten door de socket van de processor te vergelijken met die van het moederbord.
 * De processor plaatsen moet gebeuren zonder het uitoefenen van kracht: de processor valt normaalgezien in z’n socket (ZIF: zero insertion force), waarna je hem kan inklemmen.
-* Mobiele processoren zijn vaak vast op het moederbord gemonteerd, vervangen is dan onmogelijk.
+* Mobiele processoren zijn vaak vast op het moederbord gemonteerd, vervangen is dan onmogelijk. Op termijn zal dat mi
 
  
 .LGA2011 socket zonder processor
@@ -173,17 +173,19 @@ Tweede belangrijk aandachtspunt bij de installatie van een processor is dat gezo
 ===	Processoren van de toekomst
 
 Voorspellingen maken is geen sinecure. De trends die ingezet zijn, zullen vermoedelijk nog een hele poos verder gaan, met een verdere miniaturisatie en toename van efficiëntie tot gevolg. +
-Een kaper op de kust voor de x86 technologie die momenteel monopolist is op de PC-markt, is de ARM-architectuur. Hoewel deze absoluut niet nieuw is (eerste ontwerpen gaan terug tot het midden van de jaren 80), biedt deze processorfamilie grote voordelen:
+Een kaper op de kust voor de x86 technologie die momenteel monopolist is op de PC-markt, is de ARM-architectuur gebaseerd op RISC. Hoewel deze absoluut niet nieuw is (eerste ontwerpen gaan terug tot het midden van de jaren 80), biedt deze processorfamilie grote voordelen.
 
 * Deze architectuur is steeds ontworpen geweest voor toestellen met een laag verbruik. Het succes op de mobiele markt (iPAD2,3, nagenoeg alle android smartphones, consumer elektronica, …) is daar niet vreemd aan.
-* Deze architectuur is in licentie bij de meeste chipbakkers
-* Door een RISC-architectuur footnote:[Een Risc architectuur heeft een instructieset waarbij elke instructie een identieke tijd vraagt om uit te voeren. Hoewel dit de complexiteit van instructies beperkt, kan de processor daardoor wel met relatief weinig transistoren gemaakt worden. CISC (Complex instruction Set Computing) processoren, zoals de x86 familie hebben een variabele uitvoeringstijd per instructie. Dat maakt hen beter in staat om complexe instructies toe te laten, maar het maakt het kennelijk moeilijker om het stroomgebruik onder controle te houden. Voor een verdere vergelijking tussen RISC en CISC verwijs ik door naar de 
-cursus processorarchitectuur] (Reduced instruction set computing) van nature efficiënt
+* Deze architectuur is in licentie bij de meeste chipbakkers.
+* Door een RISC-architectuur (Reduced instruction set computing) van nature efficiënt.
 
-De kans dat de RISC architectuur op korte termijn succesvol wordt op de desktopmarkt is gering, en ook het omgekeerde kan gezegd worden over CISC (zoals x86) op mobiele devices. Voor specifieke servertoepassingen zijn er wel http://www.anandtech.com/show/7724/it-begins-amd-announces-its-first-arm-based-server-soc-64bit8core-opteron-a1100[aankondigingen gebeurd] door bijvoorbeeld AMD, dat zich hier sterk wil in specialiseren en profileren. 
+Een _Risc architectuur_ heeft een instructieset waarbij elke instructie een identieke tijd vraagt om uit te voeren. Hoewel dit de complexiteit van instructies beperkt, kan de processor daardoor wel met relatief weinig transistoren gemaakt worden. _CISC_ (Complex instruction Set Computing) processoren, zoals de x86 familie hebben een variabele uitvoeringstijd per instructie. Dat maakt hen beter in staat om complexe instructies toe te laten, maar het maakt het kennelijk moeilijker om het stroomgebruik onder controle te houden. Voor een verdere vergelijking tussen RISC en CISC verwijs ik door naar de 
+cursus processorarchitectuur
+
+De kans dat de RISC architectuur op korte termijn succesvol wordt op de desktopmarkt is gering, en ook het omgekeerde kan gezegd worden over CISC (zoals x86) op mobiele devices. Voor specifieke servertoepassingen zijn er wel http://www.anandtech.com/show/7724/it-begins-amd-announces-its-first-arm-based-server-soc-64bit8core-opteron-a1100[aankondigingen gebeurd] door bijvoorbeeld AMD, dat zich hier sterk wil in specialiseren en profileren om marktaandeel terug te winnen. 
 
 Toch lijken deze twee werelden van de gespecialiseerde ARM-architectuur en de meer universele x86 naar elkaar toe te groeien, en zullen de grenzen ongetwijfeld snel vervagen. +
-Microsoft heeft bijvoorbeeld eind 2012 z’n RT tablet vrijgegeven, met ARM SOC. Uiteraard zal software die gecompileerd werd voor x86 op dit soort toestellen niet werken. Ook Google Chromebooks worden zowel met ARM als met x86 gebouwd.
+Google Chromebooks worden bijvoorbeeld zowel met ARM als met x86 gebouwd.
 
 === Bibliografie bij dit hoofdstuk
 
