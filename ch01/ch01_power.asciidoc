@@ -29,6 +29,7 @@ Om het verbruik van een CPU uit te drukken, wordt vaak gesproken over *TDP* (The
 
 ==== Vormfactor en connectoren
 
+Bij computers wordt de term vormfactor gebruikt om de fysieke specificaties van het moederbord aan te geven, bijvoorbeeld de grootte, locatie van de gaten voor het bevestigen ervan, aantal poorten op het achterste paneel, het type voeding enz. 
 De eerste (IBM) PC beschikte over een moederbord met AT vormfactor, de bijhorende voeding was dan ook een AT voeding. In 1995 kwam er een opvolger, met name de ATX vormfactor. Ondertussen is deze specificatie ook geëvolueerd (ondertussen ATX 2.3). 
 
 De belangrijkste verschillen situeren zich op het vlak van de spanningen die de voeding kan afgeven en de connectoren die voorzien zijn op de voeding. 
