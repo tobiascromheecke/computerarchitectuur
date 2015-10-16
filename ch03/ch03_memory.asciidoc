@@ -270,7 +270,7 @@ Bij DDR kan ook het aantal cellen dat in een burst gelezen wordt variëren. Hetz
 Opvolgers van DDR zijn DDR2 en DDR3. Behalve verbeteringen op het vlak van klokfrequenties en spanningen (DDR2 en DDR3 gebruiken telkens lagere spanningen) is het grootste verschil dat het prefetch buffer vergroot. Bij DDR2 worden vier bits gebufferd, bij DDR3 acht. +
 DDR4, dat sinds kort beschikbaar is, verdubbelt dit *niet* nog eens , maar probeert de extra performantie vooral te halen uit hogere klokfrequenties en geoptimaliseerde signalering. Daarnaast geeft deze nieuwste specificatie ook de mogelijkheid om 3D-geheugen te gebruiken, waarbij meerdere lagen geheugen op elkaar kunnen gestapeld worden binnen dezelfde chips. <<CORS>>
 
-Het gevolg is dat deze geheugens nog sneller data naar buiten kunnen brengen (hogere maximale transfer), maar dat dit weer een hogere latentietijd met zich meebrengt. Hou wel in gedachten dat slechts een klein stukje van het geheugen aan deze hoge snelheid werkt. Intern wordt nog steeds een relatief lage snelheid gebruikt om de cellen te beschrijven, maar door de buffers kan data toch aan een dubbele (DDR), viervoudige (DDR2) of achtvoudige (DDR3) snelheid naar buiten gebacht worden.
+Het gevolg is dat deze geheugens nog sneller data naar buiten kunnen brengen (hogere maximale transfer), maar dat dit weer een hogere latentietijd met zich meebrengt. Hou wel in gedachten dat slechts een klein stukje van het geheugen aan deze hoge snelheid werkt. Intern wordt nog steeds een relatief lage snelheid gebruikt om de cellen te beschrijven, maar door de buffers kan data toch aan een dubbele (DDR), viervoudige (DDR2) of achtvoudige (DDR3) snelheid naar buiten gebracht worden.
 
 .DDR3 snelheden (bron: wikipedia)
 [format="csv",options="header"]
