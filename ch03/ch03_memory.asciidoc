@@ -460,7 +460,7 @@ Bereken de totale benodigde hoeveelheid geheugen (geheugen+tags) die nodig is om
 
 *Antwoord:*
 
-het aantal bits is een adres is 32 (latexmath:[a]) +
+het aantal bits in een adres is 32 (latexmath:[a]) +
 Een cacheline omvat 16 bytes, wat betekent dat de vier (latexmath:[b]) LSB’s niet moeten geadresseerd worden. +
 Het aantal sets is dan latexmath:[\dfrac{64\text{ KB}}{4 \times 16} = 1024] (latexmath:[c]) +
 Het aantal bits dat nodig is om deze te kunnen adresseren: latexmath:[\log_2 1024= 10 bits ] (latexmath:[d]) + 
@@ -473,7 +473,7 @@ Het aantal tag bits wordt dan:
 ++++
 Om de totale grootte dan te berekenen kan je redeneren: +
 
-* Elke cachelijn heeft 16 bits data, en een tag van 18 bits. Dit komt op een totaal van 146 bits.
+* Elke cachelijn heeft 16 bytes data, en een tag van 18 bits. Dit komt op een totaal van 146 bits.
 * Dit moet je met vier vermenigvuldigen (‘4’-way) en met het aantal sets (d), wat resulteert in 598016 bits.
 
 Het percentage overhead is dus (totaal benodigde bits)/('nuttige' bits)   of 14%
@@ -481,7 +481,7 @@ Het percentage overhead is dus (totaal benodigde bits)/('nuttige' bits)   of 14%
 
 NOTE: bereken aan de hand van vorig voorbeeld hoe de overhead zich gedraagt bij 8-way en 16-way cache geheugen.
 
-Zoals al gezegd is set associative de tussenvorm. Eigenlijk kan je zeggen dat fully associative cache ook set associative cache is, maar met slechts één set. Direct mapped cache is anderzijs set associative met slechts één lijn per set. +
+Zoals al gezegd is set-associative de tussenvorm. Eigenlijk kan je zeggen dat fully associative cache ook set-associative cache is, maar met slechts één set. Direct mapped cache is anderzijs set associative met slechts één lijn per set. +
 De eigenschappen van set associative liggen dan ook tussen de twee vormen in. +
 Het laat minder mogelijkheden voor het kiezen waar een cacheline terecht kan dan fully associative, maar meer dan direct mapped. Anderzijds heeft het minder bits nodig voor de tags en ook minder comparatoren dan bij fully associative cache. Vergeleken met direct mapped is het dan weer complexer. 
 Meer algemeen geldt dat naarmate de associativiteit toeneemt er meer keuze is in de cache lijnen, maar dat de kost die hieraan verbonden is ook hoger wordt. Omwille van de beperking van het aantal cachelines in een set is set-associative cache gemakkelijker te combineren met betere overschrijfstrategieën. Mede daardoor is fully associative cache een eerder zeldzame vorm van cache.
