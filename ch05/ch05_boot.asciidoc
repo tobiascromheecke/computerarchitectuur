@@ -95,7 +95,7 @@ Ook moederborden bieden tegenwoordig meestal ondersteuning, al zullen ze vaak no
 === Coreboot
 
 Een tweede alternatief voor BIOS is Coreboot. Dit project is conceptueel verschillend van UEFI omdat coreboot zichzelf probeert overbodig te maken. Zo snel mogelijk na het opstarten wordt de controle doorgegeven aan het besturingssysteem. 
-Coreboot zal de meest elementaire hardware initialiseren (vb RAM-geheugen) Het besturingssysteem krijgt dan alle verdere controle. Coreboot bevat zelfs geen GUI.
+Coreboot zal de meest elementaire hardware initialiseren (vb RAM-geheugen). Het besturingssysteem krijgt dan alle verdere controle. Coreboot bevat zelfs geen GUI.
 De coreboot-code is daardoor erg compact en snel. 
 
 Besturingssystemen die niet rechtstreeks kunnen booten via coreboot, kunnen gebruik maken van een alternatieve 'payload' die compatibiliteit met BIOS garandeert.
