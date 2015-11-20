@@ -422,7 +422,7 @@ Dit heeft als voordelen:
 
 *  om een bestand te zoeken moet men slechts een paar blokken van de schijf lezen(de FAT)
 * er moeten geen wijzers meer in de gegevensblokken opgeslagen worden
-* men kan de FAT meer dan eens kan opslaan op de schijf om beperkte schijfdefecten op te vangen. 
+* men kan de FAT meer dan eens opslaan op de schijf om beperkte schijfdefecten op te vangen. 
 
 Vrije blokken kunnen teruggevonden worden door een speciaal teken op de plaats van de wijzer in de FAT. MS-DOS en OS/2 maken gebruik van een FAT.
 
