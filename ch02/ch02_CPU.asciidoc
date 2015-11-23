@@ -162,7 +162,7 @@ Bij de montage van een processor moet je enkele zaken in acht nemen.
 
 * De processor moet compatibel zijn met het moederbord. Meestal kom je dit te weten door de socket van de processor te vergelijken met die van het moederbord.
 * De processor plaatsen moet gebeuren zonder het uitoefenen van kracht: de processor valt normaalgezien in z’n socket (ZIF: zero insertion force), waarna je hem kan inklemmen.
-* Mobiele processoren zijn vaak vast op het moederbord gemonteerd, vervangen is dan onmogelijk. Op termijn zal dat mi
+* Mobiele processoren zijn vaak vast op het moederbord gemonteerd, vervangen is dan onmogelijk. Op termijn zal dat mi  //deze zin is niet afgewerkt
 
  
 .LGA2011 socket zonder processor
